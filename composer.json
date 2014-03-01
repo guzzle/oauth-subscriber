@@ -1,5 +1,5 @@
 {
-    "name": "guzzle/oauth-subscriber",
+    "name": "guzzlehttp/oauth-subscriber",
     "description": "Guzzle OAuth subscriber",
     "homepage": "http://guzzlephp.org/",
     "keywords": ["oauth", "guzzle"],
