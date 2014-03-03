@@ -15,7 +15,7 @@ REST API:
 
     $client = new Client(['base_url' => 'http://api.twitter.com/1.1']);
 
-    $oauth = new OauthPlugin([
+    $oauth = new OauthSubscriber([
         'consumer_key'    => 'my_key',
         'consumer_secret' => 'my_secret',
         'token'           => 'my_token',
