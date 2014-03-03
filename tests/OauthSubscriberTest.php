@@ -210,7 +210,7 @@ class OauthSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testTwitterIntegration()
     {
-        if (!isset($_SERVER['OAUTH_CONSUMER_SECRET'])) {
+        if (empty($_SERVER['OAUTH_CONSUMER_SECRET'])) {
             $this->markTestSkipped('No OAUTH_CONSUMER_SECRET provided in phpunit.xml');
             return;
         }
@@ -242,7 +242,7 @@ class OauthSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testTwitterStreamingIntegration()
     {
-        if (!isset($_SERVER['OAUTH_CONSUMER_SECRET'])) {
+        if (empty($_SERVER['OAUTH_CONSUMER_SECRET'])) {
             $this->markTestSkipped('No OAUTH_CONSUMER_SECRET provided in phpunit.xml');
             return;
         }
@@ -268,7 +268,7 @@ class OauthSubscriberTest extends \PHPUnit_Framework_TestCase
             ]);
             $body = $response->getBody();
             $data = $body::readLine($body);
-            $this->assertContains('bieber', $data);
+            $this->assertContains('bieber', strtolower($data));
             $this->assertNotEmpty(json_decode($data, true));
             $body->close();
         } catch (ClientException $e) {
