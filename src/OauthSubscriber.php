@@ -201,17 +201,9 @@ class OauthSubscriber implements SubscriberInterface
         // ordering. Ref: Spec: 9.1.1 (1).
         uksort($data, 'strcmp');
 
-        foreach ($data as $key => &$value) {
-            switch (gettype($value)) {
-                case 'NULL':
-                    unset($data[$key]);
-                    break;
-                case 'array':
-                    $data[$key] = self::prepareParameters($value);
-                    break;
-                case 'boolean':
-                    $data[$key] = $value ? 'true' : 'false';
-                    break;
+        foreach ($data as $key => $value) {
+            if ($value === null) {
+                unset($data[$key]);
             }
         }
 
