@@ -32,7 +32,7 @@ class OauthSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testSubscribesToEvents()
     {
-        $events = OauthSubscriber::getSubscribedEvents();
+        $events = (new OauthSubscriber([]))->getEvents();
         $this->assertArrayHasKey('before', $events);
     }
 
@@ -227,7 +227,7 @@ class OauthSubscriberTest extends \PHPUnit_Framework_TestCase
             'token_secret'    => $_SERVER['OAUTH_TOKEN_SECRET']
         ]);
 
-        $client->getEmitter()->addSubscriber($oauth);
+        $client->getEmitter()->attach($oauth);
 
         try {
             $client->get('account/settings.json');
@@ -259,7 +259,7 @@ class OauthSubscriberTest extends \PHPUnit_Framework_TestCase
             'token_secret'    => $_SERVER['OAUTH_TOKEN_SECRET']
         ]);
 
-        $client->getEmitter()->addSubscriber($oauth);
+        $client->getEmitter()->attach($oauth);
 
         try {
             $response = $client->post('statuses/filter.json', [

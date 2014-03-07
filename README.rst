@@ -22,7 +22,7 @@ REST API:
         'token_secret'    => 'my_token_secret'
     ]);
 
-    $client->getEmitter()->addSubscriber($oauth);
+    $client->getEmitter()->attach($oauth);
 
     // Set the "auth" request option to "oauth" to sign using oauth
     $res = $client->get('statuses/home_timeline.json', ['auth' => 'oauth']);
@@ -39,7 +39,7 @@ the client using the client's ``defaults`` constructor option.
         'defaults' => ['auth' => 'oauth']
     ]);
 
-    $client->getEmitter()->addSubscriber($oauth);
+    $client->getEmitter()->attach($oauth);
 
     // Now you don't need to add the auth parameter
     $res = $client->get('statuses/home_timeline.json');

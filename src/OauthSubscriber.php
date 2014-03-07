@@ -66,7 +66,7 @@ class OauthSubscriber implements SubscriberInterface
         ], ['signature_method', 'version', 'consumer_key', 'consumer_secret']);
     }
 
-    public static function getSubscribedEvents()
+    public function getEvents()
     {
         return ['before' => ['onBefore', -9999]];
     }
