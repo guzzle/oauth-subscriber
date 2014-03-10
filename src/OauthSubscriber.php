@@ -14,13 +14,14 @@ use GuzzleHttp\Url;
 /**
  * OAuth 1.0 signature plugin.
  *
- * Portions of this code comes from HWIOAuthBundle:
+ * Portions of this code comes from HWIOAuthBundle and a Guzzle 3 pull request:
  * @author Alexander <iam.asm89@gmail.com>
  * @author Joseph Bielawski <stloyd@gmail.com>
  * @author Francisco Facioni <fran6co@gmail.com>
  * @link https://github.com/hwi/HWIOAuthBundle
- * @link http://oauth.net/core/1.0/#rfc.section.9.1.1 OAuth specification
  * @link https://github.com/guzzle/guzzle/pull/563 Original Guzzle 3 pull req.
+ *
+ * @link http://oauth.net/core/1.0/#rfc.section.9.1.1 OAuth specification
  */
 class OauthSubscriber implements SubscriberInterface
 {
