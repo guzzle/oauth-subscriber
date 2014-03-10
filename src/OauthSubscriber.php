@@ -69,7 +69,7 @@ class OauthSubscriber implements SubscriberInterface
 
     public function getEvents()
     {
-        return ['before' => ['onBefore', RequestEvents::SIGN]];
+        return ['before' => ['onBefore', RequestEvents::SIGN_REQUEST]];
     }
 
     public function onBefore(BeforeEvent $event)
