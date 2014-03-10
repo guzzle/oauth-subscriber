@@ -3,6 +3,7 @@
 namespace GuzzleHttp\Subscriber\Oauth;
 
 use GuzzleHttp\Collection;
+use GuzzleHttp\Event\RequestEvents;
 use GuzzleHttp\Event\SubscriberInterface;
 use GuzzleHttp\Event\BeforeEvent;
 use GuzzleHttp\Message\RequestInterface;
@@ -68,7 +69,7 @@ class OauthSubscriber implements SubscriberInterface
 
     public function getEvents()
     {
-        return ['before' => ['onBefore', -9999]];
+        return ['before' => ['onBefore', RequestEvents::SIGN]];
     }
 
     public function onBefore(BeforeEvent $event)
