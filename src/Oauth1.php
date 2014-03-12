@@ -23,7 +23,7 @@ use GuzzleHttp\Url;
  *
  * @link http://oauth.net/core/1.0/#rfc.section.9.1.1 OAuth specification
  */
-class OauthSubscriber implements SubscriberInterface
+class Oauth1 implements SubscriberInterface
 {
     /**
      * Consumer request method constants. See http://oauth.net/core/1.0/#consumer_req_param

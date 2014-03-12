@@ -1,6 +1,6 @@
 <?php
 
-namespace GuzzleHttp\Tests\OauthSubscriber;
+namespace GuzzleHttp\Tests\Oauth1;
 
 use GuzzleHttp\Adapter\Transaction;
 use GuzzleHttp\Client;
@@ -8,9 +8,9 @@ use GuzzleHttp\Event\BeforeEvent;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Message\Request;
 use GuzzleHttp\Post\PostBody;
-use GuzzleHttp\Subscriber\Oauth\OauthSubscriber;
+use GuzzleHttp\Subscriber\Oauth\Oauth1;
 
-class OauthSubscriberTest extends \PHPUnit_Framework_TestCase
+class Oauth1Test extends \PHPUnit_Framework_TestCase
 {
     const TIMESTAMP = '1327274290';
     const NONCE = 'e7aa11195ca58349bec8b5ebe351d3497eb9e603';
@@ -32,13 +32,13 @@ class OauthSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testSubscribesToEvents()
     {
-        $events = (new OauthSubscriber([]))->getEvents();
+        $events = (new Oauth1([]))->getEvents();
         $this->assertArrayHasKey('before', $events);
     }
 
     public function testAcceptsConfigurationData()
     {
-        $p = new OauthSubscriber($this->config);
+        $p = new Oauth1($this->config);
 
         // Access the config object
         $class = new \ReflectionClass($p);
@@ -57,7 +57,7 @@ class OauthSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testCreatesStringToSignFromPostRequest()
     {
-        $s = new OauthSubscriber($this->config);
+        $s = new Oauth1($this->config);
         $client = new Client();
         $request = $client->createRequest('POST', 'http://httpbin.org', [
             'auth' => 'oauth',
@@ -76,8 +76,8 @@ class OauthSubscriberTest extends \PHPUnit_Framework_TestCase
     public function testSignsPlainText()
     {
         $config = $this->config;
-        $config['signature_method'] = OauthSubscriber::SIGNATURE_METHOD_PLAINTEXT;
-        $s = new OauthSubscriber($config);
+        $config['signature_method'] = Oauth1::SIGNATURE_METHOD_PLAINTEXT;
+        $s = new Oauth1($config);
         $client = new Client();
         $request = $client->createRequest('GET', 'http://httpbin.org', ['auth' => 'oauth']);
         $before = new BeforeEvent(new Transaction($client, $request));
@@ -89,7 +89,7 @@ class OauthSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testSignsOauthRequestsInHeader()
     {
-        $s = new OauthSubscriber($this->config);
+        $s = new Oauth1($this->config);
         $client = new Client();
         $request = $client->createRequest('GET', 'http://httpbin.org', ['auth' => 'oauth']);
         $before = new BeforeEvent(new Transaction($client, $request));
@@ -107,8 +107,8 @@ class OauthSubscriberTest extends \PHPUnit_Framework_TestCase
     public function testSignsOauthQueryStringRequest()
     {
         $config = $this->config;
-        $config['request_method'] = OauthSubscriber::REQUEST_METHOD_QUERY;
-        $s = new OauthSubscriber($config);
+        $config['request_method'] = Oauth1::REQUEST_METHOD_QUERY;
+        $s = new Oauth1($config);
         $client = new Client();
         $request = $client->createRequest('GET', 'http://httpbin.org', ['auth' => 'oauth']);
         $before = new BeforeEvent(new Transaction($client, $request));
@@ -128,7 +128,7 @@ class OauthSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testOnlyTouchesWhenAuthConfigIsOauth()
     {
-        $s = new OauthSubscriber($this->config);
+        $s = new Oauth1($this->config);
         $client = new Client();
         $request = $client->createRequest('GET', 'http://httpbin.org');
         $before = new BeforeEvent(new Transaction($client, $request));
@@ -144,7 +144,7 @@ class OauthSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $config = $this->config;
         $config['request_method'] = 'Foo';
-        $s = new OauthSubscriber($config);
+        $s = new Oauth1($config);
         $client = new Client();
         $before = new BeforeEvent(new Transaction(
             $client,
@@ -160,7 +160,7 @@ class OauthSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $config = $this->config;
         $config['signature_method'] = 'Foo';
-        $s = new OauthSubscriber($config);
+        $s = new Oauth1($config);
         $client = new Client();
         $before = new BeforeEvent(new Transaction(
             $client,
@@ -173,7 +173,7 @@ class OauthSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $config = $this->config;
         unset($config['token']);
-        $s = new OauthSubscriber($config);
+        $s = new Oauth1($config);
         $client = new Client();
         $request = $client->createRequest('GET', 'http://httpbin.org', ['auth' => 'oauth']);
         $before = new BeforeEvent(new Transaction($client, $request));
@@ -186,7 +186,7 @@ class OauthSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $config = $this->config;
         $config['foo'] = 'bar';
-        $s = new OauthSubscriber($config);
+        $s = new Oauth1($config);
         $client = new Client();
         $request = $client->createRequest('GET', 'http://httpbin.org', ['auth' => 'oauth']);
         $before = new BeforeEvent(new Transaction($client, $request));
@@ -199,7 +199,7 @@ class OauthSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $config = $this->config;
         $config['realm'] = 'foo';
-        $s = new OauthSubscriber($config);
+        $s = new Oauth1($config);
         $client = new Client();
         $request = $client->createRequest('GET', 'http://httpbin.org', ['auth' => 'oauth']);
         $before = new BeforeEvent(new Transaction($client, $request));
@@ -220,7 +220,7 @@ class OauthSubscriberTest extends \PHPUnit_Framework_TestCase
             'defaults' => ['auth' => 'oauth']
         ]);
 
-        $oauth = new OauthSubscriber([
+        $oauth = new Oauth1([
             'consumer_key'    => $_SERVER['OAUTH_CONSUMER_KEY'],
             'consumer_secret' => $_SERVER['OAUTH_CONSUMER_SECRET'],
             'token'           => $_SERVER['OAUTH_TOKEN'],
@@ -252,7 +252,7 @@ class OauthSubscriberTest extends \PHPUnit_Framework_TestCase
             'defaults' => ['auth' => 'oauth']
         ]);
 
-        $oauth = new OauthSubscriber([
+        $oauth = new Oauth1([
             'consumer_key'    => $_SERVER['OAUTH_CONSUMER_KEY'],
             'consumer_secret' => $_SERVER['OAUTH_CONSUMER_SECRET'],
             'token'           => $_SERVER['OAUTH_TOKEN'],

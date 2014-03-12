@@ -11,11 +11,11 @@ REST API:
 .. code-block:: php
 
     use GuzzleHttp\Client;
-    use GuzzleHttp\Subscriber\Oauth\OauthSubscriber;
+    use GuzzleHttp\Subscriber\Oauth\Oauth1;
 
     $client = new Client(['base_url' => 'http://api.twitter.com/1.1']);
 
-    $oauth = new OauthSubscriber([
+    $oauth = new Oauth1([
         'consumer_key'    => 'my_key',
         'consumer_secret' => 'my_secret',
         'token'           => 'my_token',
