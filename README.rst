@@ -5,6 +5,25 @@ Guzzle OAuth Subscriber
 Signs HTTP requests using OAuth 1.0. Requests are signed using a consumer key,
 consumer secret, OAuth token, and OAuth secret.
 
+Installing
+==========
+
+This project can be installed using Composer. Add the following to your
+composer.json:
+
+.. code-block:: javascript
+
+    {
+        "require": {
+            "guzzlehttp/oauth-subscriber": "0.1.0"
+        }
+    }
+
+
+
+Using the Subscriber
+====================
+
 Here's an example showing how to send an authenticated request to the Twitter
 REST API:
 
