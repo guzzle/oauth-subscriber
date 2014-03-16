@@ -20,5 +20,6 @@
     },
     "autoload": {
         "psr-4": { "GuzzleHttp\\Subscriber\\Oauth\\": "src" }
-    }
+    },
+    "minimum-stability": "dev"
 }
