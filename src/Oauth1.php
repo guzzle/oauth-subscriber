@@ -124,8 +124,11 @@ class Oauth1 implements SubscriberInterface
 
         // Add POST fields if the request uses POST fields and no files
         $body = $request->getBody();
-        if ($body instanceof PostBodyInterface && !$body->getFiles()) {
+        if ($body instanceof PostBodyInterface) {
             $params += Query::fromString($body->getFields(true))->toArray();
+            foreach($body->getFiles() as $file){
+                unset($params[$file->getName()]);
+            }
         }
 
         // Parse & add query string parameters as base string parameters
