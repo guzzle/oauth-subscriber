@@ -65,6 +65,7 @@ class Oauth1 implements SubscriberInterface
             'consumer_key'     => 'anonymous',
             'consumer_secret'  => 'anonymous',
             'signature_method' => self::SIGNATURE_METHOD_HMAC,
+            'sign_multipart'   => false,
             'unsigned_params'  => array(),
         ], ['signature_method', 'version', 'consumer_key', 'consumer_secret']);
     }
@@ -125,7 +126,7 @@ class Oauth1 implements SubscriberInterface
 
         // Add POST fields if the request uses POST fields and no files
         $body = $request->getBody();
-        if ($body instanceof PostBodyInterface && !$body->getFiles()) {
+        if ($body instanceof PostBodyInterface && (!$body->getFiles() || $this->config['sign_multipart'])) {
             $params += Query::fromString($body->getFields(true))->toArray();
         }
 
