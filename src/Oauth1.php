@@ -65,6 +65,7 @@ class Oauth1 implements SubscriberInterface
             'consumer_key'     => 'anonymous',
             'consumer_secret'  => 'anonymous',
             'signature_method' => self::SIGNATURE_METHOD_HMAC,
+            'unsigned_params'  => array(),
         ], ['signature_method', 'version', 'consumer_key', 'consumer_secret']);
     }
 
@@ -124,11 +125,8 @@ class Oauth1 implements SubscriberInterface
 
         // Add POST fields if the request uses POST fields and no files
         $body = $request->getBody();
-        if ($body instanceof PostBodyInterface) {
+        if ($body instanceof PostBodyInterface && !$body->getFiles()) {
             $params += Query::fromString($body->getFields(true))->toArray();
-            foreach($body->getFiles() as $file){
-                unset($params[$file->getName()]);
-            }
         }
 
         // Parse & add query string parameters as base string parameters
@@ -207,7 +205,7 @@ class Oauth1 implements SubscriberInterface
         uksort($data, 'strcmp');
 
         foreach ($data as $key => $value) {
-            if ($value === null) {
+            if ($value === null || in_array($key, $this->config['unsigned_params'])) {
                 unset($data[$key]);
             }
         }
