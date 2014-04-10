@@ -15,7 +15,7 @@ composer.json:
 
     {
         "require": {
-            "guzzlehttp/oauth-subscriber": "0.1.0"
+            "guzzlehttp/oauth-subscriber": "0.1.x"
         }
     }
 
