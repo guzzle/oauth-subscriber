@@ -56,7 +56,7 @@ class Oauth2 implements SubscriberInterface
         return $this->accessToken;
     }
 
-    protected function getAuthorizationHeader(AccessToken $token)
+    private function getAuthorizationHeader(AccessToken $token)
     {
         return sprintf('Bearer %s', $token->getToken());
     }
