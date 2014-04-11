@@ -24,10 +24,17 @@ class Oauth2 implements SubscriberInterface
 
     public function onBefore(BeforeEvent $event)
     {
+        $request = $event->getRequest();
+
+        // Only sign requests using "auth"="oauth"
+        if ($request->getConfig()->get('auth') != 'oauth2') {
+            return;
+        }
+
         $token = $this->getAccessToken();
         $header = $this->getAuthorizationHeader($token);
 
-        $event->getRequest()->setHeader('Authorization', $header);
+        $request->setHeader('Authorization', $header);
     }
 
     /**
