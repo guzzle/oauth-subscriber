@@ -11,7 +11,7 @@ class AccessToken
 
     public function __construct($token, $expiresIn, $type, $scope)
     {
-        $this->token= $token;
+        $this->token = $token;
         $this->expires = new \DateTime();
         $this->expires->add(new \DateInterval(sprintf('PT%sS', $expiresIn)));
         $this->type = $type;

@@ -2,6 +2,7 @@
 
 namespace GuzzleHttp\Subscriber\Oauth;
 
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Event\BeforeEvent;
 use GuzzleHttp\Event\ErrorEvent;
 use GuzzleHttp\Event\RequestEvents;
@@ -59,9 +60,9 @@ class Oauth2 implements SubscriberInterface
     /**
      * Set access token
      *
-     * @param string $accessToken
+     * @param AccessToken $accessToken OAuth2 access token
      */
-    public function setAccessToken($accessToken)
+    public function setAccessToken(AccessToken $accessToken)
     {
         $this->accessToken = $accessToken;
     }
@@ -69,7 +70,7 @@ class Oauth2 implements SubscriberInterface
     /**
      * Get access token
      *
-     * @return string
+     * @return AccessToken Oauth2 access token
      */
     public function getAccessToken()
     {
