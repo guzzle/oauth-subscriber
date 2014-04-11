@@ -9,8 +9,8 @@ use GuzzleHttp\Subscriber\Oauth\GrantType\GrantTypeInterface;
 
 class Oauth2 implements SubscriberInterface
 {
-    protected $accessToken;
-    protected $grantType;
+    private $accessToken;
+    private $grantType;
 
     public function __construct(GrantTypeInterface $grantType = null)
     {

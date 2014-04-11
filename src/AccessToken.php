@@ -4,10 +4,10 @@ namespace GuzzleHttp\Subscriber\Oauth;
 
 class AccessToken
 {
-    protected $token;
-    protected $expires;
-    protected $type;
-    protected $scope;
+    private $token;
+    private $expires;
+    private $type;
+    private $scope;
 
     public function __construct($token, $expiresIn, $type, $scope)
     {
