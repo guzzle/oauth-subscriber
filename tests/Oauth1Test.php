@@ -40,11 +40,7 @@ class Oauth1Test extends \PHPUnit_Framework_TestCase
     {
         $p = new Oauth1($this->config);
 
-        // Access the config object
-        $class = new \ReflectionClass($p);
-        $property = $class->getProperty('config');
-        $property->setAccessible(true);
-        $config = $property->getValue($p);
+        $config = $p->getConfig();
 
         $this->assertEquals('foo', $config['consumer_key']);
         $this->assertEquals('bar', $config['consumer_secret']);

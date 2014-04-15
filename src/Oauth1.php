@@ -57,7 +57,17 @@ class Oauth1 implements SubscriberInterface
      *
      * @param array $config Configuration array.
      */
-    public function __construct($config)
+    public function __construct(array $config)
+    {
+        $this->setConfig($config);
+    }
+
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    public function setConfig(array $config)
     {
         $this->config = Collection::fromConfig($config, [
             'version'          => '1.0',
@@ -66,6 +76,7 @@ class Oauth1 implements SubscriberInterface
             'consumer_secret'  => 'anonymous',
             'signature_method' => self::SIGNATURE_METHOD_HMAC,
         ], ['signature_method', 'version', 'consumer_key', 'consumer_secret']);
+        return $this;
     }
 
     public function getEvents()
