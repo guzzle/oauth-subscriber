@@ -32,7 +32,7 @@ REST API:
     use GuzzleHttp\Client;
     use GuzzleHttp\Subscriber\Oauth\Oauth1;
 
-    $client = new Client(['base_url' => 'http://api.twitter.com/1.1']);
+    $client = new Client(['base_url' => 'https://api.twitter.com/1.1/']);
 
     $oauth = new Oauth1([
         'consumer_key'    => 'my_key',
@@ -54,7 +54,7 @@ the client using the client's ``defaults`` constructor option.
     use GuzzleHttp\Client;
 
     $client = new Client([
-        'base_url' => 'http://api.twitter.com/1.1',
+        'base_url' => 'https://api.twitter.com/1.1/',
         'defaults' => ['auth' => 'oauth']
     ]);
 
