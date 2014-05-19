@@ -289,10 +289,10 @@ class Oauth1 implements SubscriberInterface
         // the config as the parameter may be considered invalid by the Oauth
         // service.
         $optionalParams = [
+            'callback'  => 'oauth_callback',
             'token'     => 'oauth_token',
             'verifier'  => 'oauth_verifier',
-            'version'   => 'oauth_version',
-            'callback'  => 'oauth_callback'
+            'version'   => 'oauth_version'
         ];
 
         foreach ($optionalParams as $optionName => $oauthName) {
