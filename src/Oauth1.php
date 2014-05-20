@@ -45,6 +45,7 @@ class Oauth1 implements SubscriberInterface
      *
      * - request_method: Consumer request method. One of 'header' or 'query'.
      *   Defaults to 'header'.
+     * - callback: OAuth callback
      * - consumer_key: Consumer key string. Defaults to "anonymous".
      * - consumer_secret: Consumer secret. Defaults to "anonymous".
      * - token: Client token
@@ -288,6 +289,7 @@ class Oauth1 implements SubscriberInterface
         // the config as the parameter may be considered invalid by the Oauth
         // service.
         $optionalParams = [
+            'callback'  => 'oauth_callback',
             'token'     => 'oauth_token',
             'verifier'  => 'oauth_verifier',
             'version'   => 'oauth_version'
