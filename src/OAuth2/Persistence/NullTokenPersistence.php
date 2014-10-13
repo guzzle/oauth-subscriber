@@ -6,25 +6,16 @@ use GuzzleHttp\Subscriber\OAuth2\RawToken;
 
 class NullTokenPersistence implements TokenPersistenceInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function saveToken(RawToken $token)
     {
         return;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function restoreToken()
+    public function restoreToken(callable $tokenFactory)
     {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function deleteToken()
     {
         return;

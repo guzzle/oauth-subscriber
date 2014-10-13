@@ -9,9 +9,10 @@ interface TokenPersistenceInterface
     /**
      * Restore the token data.
      *
+     * @param  callable $tokenFactory
      * @return RawToken
      */
-    public function restoreToken();
+    public function restoreToken(callable $tokenFactory);
 
     /**
      * Save the token data.

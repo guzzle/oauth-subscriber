@@ -23,18 +23,12 @@ class DoctrineCacheTokenPersistence implements TokenPersistenceInterface
         $this->cacheKey = $cacheKey;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function saveToken(RawToken $token)
     {
         $this->cache->save($this->cacheKey, $token->toArray());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function restoreToken()
+    public function restoreToken(callable $tokenFactory)
     {
         $data = $this->cache->fetch($this->cacheKey);
 
@@ -42,12 +36,9 @@ class DoctrineCacheTokenPersistence implements TokenPersistenceInterface
             return null;
         }
 
-        return RawToken::fromArray($data);
+        return $tokenFactory($data);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function deleteToken()
     {
         $this->cache->delete($this->cacheKey);

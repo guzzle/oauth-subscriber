@@ -26,24 +26,6 @@ class RawToken
     protected $expiresAt;
 
     /**
-     * Build a RawToken from a normalized array data
-     *
-     * @return RawToken new self
-     */
-    public static function fromArray(array $data)
-    {
-        if (!isset($data['access_token'])) {
-            throw new \InvalidArgumentException('Unable to create a RawToken without an "access_token"')
-        }
-
-        return new self(
-            $data['access_token'],
-            isset($data['refresh_token']) ? $data['refresh_token'] : null,
-            isset($data['expires_at']) ? $data['expires_at'] : null,
-        );
-    }
-
-    /**
      * @param string $accessToken
      * @param string $refreshToken
      * @param int    $expiresAt

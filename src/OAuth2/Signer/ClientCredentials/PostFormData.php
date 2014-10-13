@@ -15,9 +15,6 @@ class PostFormData implements SignerInterface
         $this->clientSecretField = $clientSecretField;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function sign(RequestInterface $request, $clientId, $clientSecret)
     {
         $body = $request->getBody();

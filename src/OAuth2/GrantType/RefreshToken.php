@@ -4,6 +4,7 @@ namespace GuzzleHttp\Subscriber\OAuth2\GrantType;
 
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Collection;
+use GuzzleHttp\Post\PostBody;
 use GuzzleHttp\Subscriber\OAuth2\Exception\ReauthorizationException;
 use GuzzleHttp\Subscriber\OAuth2\Signer\ClientCredentials\SignerInterface;
 use GuzzleHttp\Subscriber\OAuth2\TokenData;
@@ -47,10 +48,7 @@ class RefreshToken implements GrantTypeInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTokenData(SignerInterface $clientCredentialsSigner, $refreshToken = null)
+    public function getRawData(SignerInterface $clientCredentialsSigner, $refreshToken = null)
     {
         $postBody = [
             'grant_type' => 'refresh_token',

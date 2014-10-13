@@ -1,6 +1,6 @@
 {
     "name": "guzzlehttp/oauth-subscriber",
-    "description": "Guzzle OAuth 1.0 subscriber",
+    "description": "Guzzle Subscriber for OAuth 1.0 and 2.0",
     "homepage": "http://guzzlephp.org/",
     "keywords": ["oauth", "guzzle"],
     "license": "MIT",
@@ -23,6 +23,11 @@
         "psr-4": {
             "GuzzleHttp\\Subscriber\\OAuth2\\": "src/OAuth2",
             "GuzzleHttp\\Subscriber\\Oauth\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "GuzzleHttp\\Subscriber\\OAuth2\\Tests\\": "tests/OAuth2"
         }
     },
     "extra": {

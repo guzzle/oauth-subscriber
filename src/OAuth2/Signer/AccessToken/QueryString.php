@@ -13,9 +13,6 @@ class QueryString implements SignerInterface
         $this->fieldName = $fieldName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function sign(RequestInterface $request, $accessToken)
     {
         $request->getQuery()->set($this->fieldName, $accessToken);

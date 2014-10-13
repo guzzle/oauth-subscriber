@@ -6,9 +6,6 @@ use GuzzleHttp\Message\RequestInterface;
 
 class BasicAuth implements SignerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function sign(RequestInterface $request, $clientId, $clientSecret)
     {
         $request->getConfig()->set('auth', 'basic');

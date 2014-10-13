@@ -1,6 +1,6 @@
 <?php
 
-namespace GuzzleHttp\Subscriber\OAuth2\GrantType;
+namespace GuzzleHttp\Subscriber\OAuth2\GrantType\Specific;
 
 use GuzzleHttp\Subscriber\OAuth2\Signer\ClientCredentials\SignerInterface;
 use GuzzleHttp\Subscriber\OAuth2\TokenData;
@@ -34,10 +34,7 @@ class HWIOAuthBundleRefreshToken implements GrantTypeInterface
         $this->resourceOwnerMap = $resourceOwnerMap;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTokenData(SignerInterface $clientCredentialsSigner, $refreshToken = null)
+    public function getRawData(SignerInterface $clientCredentialsSigner, $refreshToken = null)
     {
         $token = $this->securityContext->getToken();
         $resourceName = $token->getResourceOwnerName();

@@ -49,9 +49,6 @@ class ClientCredentials implements GrantTypeInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRawData(SignerInterface $clientCredentialsSigner, $refreshToken = null)
     {
         $request = $this->client->createRequest('POST', null);
