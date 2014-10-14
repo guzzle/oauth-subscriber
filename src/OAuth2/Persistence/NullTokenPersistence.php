@@ -2,16 +2,17 @@
 
 namespace GuzzleHttp\Subscriber\OAuth2\Persistence;
 
-use GuzzleHttp\Subscriber\OAuth2\RawToken;
+use GuzzleHttp\Subscriber\OAuth2\Token\RawToken;
+use GuzzleHttp\Subscriber\OAuth2\Token\TokenInterface;
 
 class NullTokenPersistence implements TokenPersistenceInterface
 {
-    public function saveToken(RawToken $token)
+    public function saveToken(TokenInterface $token)
     {
         return;
     }
 
-    public function restoreToken(callable $tokenFactory)
+    public function restoreToken(TokenInterface $token)
     {
         return null;
     }

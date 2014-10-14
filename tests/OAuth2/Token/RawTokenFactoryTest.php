@@ -1,12 +1,12 @@
 <?php
 
-namespace GuzzleHttp\Subscriber\OAuth2\Tests\Factory;
+namespace GuzzleHttp\Subscriber\OAuth2\Tests\Token;
 
 use PHPUnit_Framework_TestCase;
-use GuzzleHttp\Subscriber\OAuth2\RawToken;
-use GuzzleHttp\Subscriber\OAuth2\Factory\GenericTokenFactory;
+use GuzzleHttp\Subscriber\OAuth2\Token\RawToken;
+use GuzzleHttp\Subscriber\OAuth2\Token\RawTokenFactory;
 
-class GenericTokenFactoryTest extends PHPUnit_Framework_TestCase
+class RawTokenFactoryTest extends PHPUnit_Framework_TestCase
 {
     public function testInvoke()
     {
@@ -16,31 +16,15 @@ class GenericTokenFactoryTest extends PHPUnit_Framework_TestCase
             'expires_in' => 3600,
         ];
 
-        $factory = new GenericTokenFactory();
+        $factory = new RawTokenFactory();
         $token = $factory($tokenData);
 
-        $this->assertInstanceOf('\GuzzleHttp\Subscriber\OAuth2\RawToken', $token);
+        $this->assertInstanceOf('\GuzzleHttp\Subscriber\OAuth2\Token\RawToken', $token);
         $this->assertEquals($tokenData['access_token'], $token->getAccessToken());
         $this->assertEquals($tokenData['refresh_token'], $token->getRefreshToken());
 
         // Due to timing issues, this could be something other than 0
         $this->assertLessThan(2, $token->getExpiresAt() - (time() + $tokenData['expires_in']));
-    }
-
-    public function testPrefersExpiresAt()
-    {
-        $tokenData = [
-            'access_token' => '01234567890123456789abcdef',
-            'refresh_token' => '01234567890123456789abcdef',
-            'expires_at' => time()+3600,
-            'expires_in' => -3600,
-        ];
-
-        $factory = new GenericTokenFactory();
-        $token = $factory($tokenData);
-
-        $this->assertEquals($tokenData['expires_at'], $token->getExpiresAt());
-        $this->assertFalse($token->isExpired());
     }
 
     public function testIsExpired()
@@ -51,7 +35,7 @@ class GenericTokenFactoryTest extends PHPUnit_Framework_TestCase
             'expires_in' => -3600,
         ];
 
-        $factory = new GenericTokenFactory();
+        $factory = new RawTokenFactory();
         $token = $factory($tokenData);
 
         $this->assertTrue($token->isExpired());
@@ -60,13 +44,6 @@ class GenericTokenFactoryTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($factory($tokenData)->isExpired());
 
         unset($tokenData['expires_in']);
-        $tokenData['expires_at'] = time()-3600;
-        $this->assertTrue($factory($tokenData)->isExpired());
-
-        $tokenData['expires_at'] = time()+3600;
-        $this->assertFalse($factory($tokenData)->isExpired());
-
-        unset($tokenData['expires_at']);
         $tokenData['expires'] = -3600;
         $this->assertTrue($factory($tokenData)->isExpired());
 
@@ -76,7 +53,7 @@ class GenericTokenFactoryTest extends PHPUnit_Framework_TestCase
 
     public function testPreviousRefreshToken()
     {
-        $factory = new GenericTokenFactory();
+        $factory = new RawTokenFactory();
 
         $first_token = $factory([
             'access_token' => 'first_access',

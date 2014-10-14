@@ -3,7 +3,8 @@
 namespace GuzzleHttp\Subscriber\OAuth2\Tests\Persistence;
 
 use GuzzleHttp\Subscriber\OAuth2\Persistence\DoctrineCacheTokenPersistence;
-use GuzzleHttp\Subscriber\OAuth2\Factory\GenericTokenFactory;
+use GuzzleHttp\Subscriber\OAuth2\Token\RawToken;
+use GuzzleHttp\Subscriber\OAuth2\Token\RawTokenFactory;
 use Doctrine\Common\Cache\ArrayCache;
 
 class DoctrineCacheTokenPersistenceTest extends TokenPersistenceTestBase
@@ -24,7 +25,7 @@ class DoctrineCacheTokenPersistenceTest extends TokenPersistenceTestBase
     {
         $doctrine = new DoctrineCacheTokenPersistence($this->cache, 'foo-bar');
 
-        $factory = new GenericTokenFactory();
+        $factory = new RawTokenFactory();
         $token = $factory([
             'access_token' => 'abcdefghijklmnop',
             'refresh_token' => '0123456789abcdef',
@@ -32,11 +33,11 @@ class DoctrineCacheTokenPersistenceTest extends TokenPersistenceTestBase
         ]);
         $doctrine->saveToken($token);
 
-        $restoredToken = $doctrine->restoreToken($factory);
-        $this->assertInstanceOf('\GuzzleHttp\Subscriber\OAuth2\RawToken', $restoredToken);
+        $restoredToken = $doctrine->restoreToken(new RawToken);
+        $this->assertInstanceOf('\GuzzleHttp\Subscriber\OAuth2\Token\RawToken', $restoredToken);
 
-        $tokenBefore = $token->toArray();
-        $tokenAfter = $restoredToken->toArray();
+        $tokenBefore = $token->serialize();
+        $tokenAfter = $restoredToken->serialize();
 
         $this->assertEquals($tokenBefore, $tokenAfter);
     }

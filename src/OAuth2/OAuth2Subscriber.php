@@ -7,18 +7,6 @@ use GuzzleHttp\Event\ErrorEvent;
 use GuzzleHttp\Event\RequestEvents;
 use GuzzleHttp\Event\SubscriberInterface;
 use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\Subscriber\OAuth2\Exception\AccessTokenRequestException;
-use GuzzleHttp\Subscriber\OAuth2\Exception\OAuth2Exception;
-use GuzzleHttp\Subscriber\OAuth2\Exception\ReauthorizationException;
-use GuzzleHttp\Subscriber\OAuth2\Exception\RefreshTokenRequestException;
-use GuzzleHttp\Subscriber\OAuth2\Factory\GenericTokenFactory;
-use GuzzleHttp\Subscriber\OAuth2\GrantType\GrantTypeInterface;
-use GuzzleHttp\Subscriber\OAuth2\Persistence\NullTokenPersistence;
-use GuzzleHttp\Subscriber\OAuth2\Persistence\TokenPersistenceInterface;
-use GuzzleHttp\Subscriber\OAuth2\Signer\AccessToken\BasicAuth as AccessTokenBasicAuth;
-use GuzzleHttp\Subscriber\OAuth2\Signer\AccessToken\SignerInterface as AccessTokenSigner;
-use GuzzleHttp\Subscriber\OAuth2\Signer\ClientCredentials\BasicAuth as ClientCredentialsBasicAuth;
-use GuzzleHttp\Subscriber\OAuth2\Signer\ClientCredentials\SignerInterface as ClientCredentialsSigner;
 
 /**
  * OAuth2 plugin.
@@ -62,7 +50,7 @@ class OAuth2Subscriber implements SubscriberInterface
     /**
      * The object including access token.
      *
-     * @var RawToken
+     * @var TokenInterface
      */
     protected $rawToken;
 
@@ -77,23 +65,23 @@ class OAuth2Subscriber implements SubscriberInterface
      * @param GrantTypeInterface $grantType
      * @param GrantTypeInterface $refreshTokenGrantType
      */
-    public function __construct(GrantTypeInterface $grantType = null, GrantTypeInterface $refreshTokenGrantType = null)
+    public function __construct(GrantType\GrantTypeInterface $grantType = null, GrantType\GrantTypeInterface $refreshTokenGrantType = null)
     {
         // Tokens
         $this->grantType = $grantType;
         $this->refreshTokenGrantType = $refreshTokenGrantType;
 
         // Default services
-        $this->clientCredentialsSigner = new ClientCredentialsBasicAuth();
-        $this->accessTokenSigner = new AccessTokenBasicAuth();
-        $this->tokenPersistence = new NullTokenPersistence();
-        $this->tokenFactory = new GenericTokenFactory();
+        $this->clientCredentialsSigner = new Signer\ClientCredentials\BasicAuth();
+        $this->accessTokenSigner = new Signer\AccessToken\BasicAuth();
+        $this->tokenPersistence = new Persistence\NullTokenPersistence();
+        $this->tokenFactory = new Token\RawTokenFactory();
     }
 
     /**
-     * @param ClientCredentialsSigner $signer
+     * @param Signer\ClientCredentials\SignerInterface $signer
      */
-    public function setClientCredentialsSigner(ClientCredentialsSigner $signer)
+    public function setClientCredentialsSigner(Signer\ClientCredentials\SignerInterface $signer)
     {
         $this->clientCredentialsSigner = $signer;
 
@@ -101,9 +89,9 @@ class OAuth2Subscriber implements SubscriberInterface
     }
 
     /**
-     * @param AccessTokenSigner $signer
+     * @param AccessToken\SignerInterface $signer
      */
-    public function setAccessTokenSigner(AccessTokenSigner $signer)
+    public function setAccessTokenSigner(Signer\AccessToken\SignerInterface $signer)
     {
         $this->accessTokenSigner = $signer;
 
@@ -111,9 +99,9 @@ class OAuth2Subscriber implements SubscriberInterface
     }
 
     /**
-     * @param TokenPersistenceInterface $tokenPersistence
+     * @param Persistence\TokenPersistenceInterface $tokenPersistence
      */
-    public function setTokenPersistence(TokenPersistenceInterface $tokenPersistence)
+    public function setTokenPersistence(Persistence\TokenPersistenceInterface $tokenPersistence)
     {
         $this->tokenPersistence = $tokenPersistence;
 
@@ -203,18 +191,18 @@ class OAuth2Subscriber implements SubscriberInterface
     /**
      * Manually set the access token.
      *
-     * @param string|array|RawToken $token An array of token data, an access token string, or a RawToken object
+     * @param string|array|TokenInterface $token An array of token data, an access token string, or a TokenInterface object
      */
     public function setAccessToken($token)
     {
-        if ($token instanceOf RawToken) {
+        if ($token instanceOf Token\TokenInterface) {
             $this->rawToken = $token;
         } else {
             $this->rawToken = is_array($token) ? $this->tokenFactory($token) : $this->tokenFactory(['access_token' => $token]);
         }
 
         if ($this->rawToken === null) {
-            throw new OAuth2Exception("setAccessToken() takes a string, array or RawToken object");
+            throw new Exception\OAuth2Exception("setAccessToken() takes a string, array or TokenInterface object");
         }
 
         return $this;
@@ -231,7 +219,7 @@ class OAuth2Subscriber implements SubscriberInterface
     {
         // If token is not set try to get it from the persistent storage.
         if (null === $this->rawToken) {
-            $this->rawToken = $this->tokenPersistence->restoreToken($this->tokenFactory);
+            $this->rawToken = $this->tokenPersistence->restoreToken(new Token\RawToken());
         }
 
         // If token is not set or expired then try to acquire a new one...
@@ -253,7 +241,7 @@ class OAuth2Subscriber implements SubscriberInterface
     /**
      * Helper method for (callable)tokenFactory
      *
-     * @return RawToken
+     * @return TokenInterface
      */
     protected function tokenFactory()
     {
@@ -263,7 +251,7 @@ class OAuth2Subscriber implements SubscriberInterface
     /**
      * Acquire a new access token from the server.
      *
-     * @return RawToken|null
+     * @return TokenInterface|null
      *
      * @throws AccessTokenRequestException
      */
@@ -287,7 +275,7 @@ class OAuth2Subscriber implements SubscriberInterface
         }
 
         if ($this->grantType === null) {
-            throw new ReauthorizationException('You must specify a grantType class to request an access token');
+            throw new Exception\ReauthorizationException('You must specify a grantType class to request an access token');
         }
 
         try {
@@ -296,7 +284,7 @@ class OAuth2Subscriber implements SubscriberInterface
 
             $this->rawToken = $this->tokenFactory($rawData);
         } catch (BadResponseException $e) {
-            throw new AccessTokenRequestException('Unable to request a new access token', $e);
+            throw new Exception\AccessTokenRequestException('Unable to request a new access token', $e);
         }
     }
 }

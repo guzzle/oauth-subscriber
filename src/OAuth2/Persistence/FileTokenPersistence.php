@@ -2,7 +2,8 @@
 
 namespace GuzzleHttp\Subscriber\OAuth2\Persistence;
 
-use GuzzleHttp\Subscriber\OAuth2\RawToken;
+use GuzzleHttp\Subscriber\OAuth2\Token\RawToken;
+use GuzzleHttp\Subscriber\OAuth2\Token\TokenInterface;
 
 class FileTokenPersistence implements TokenPersistenceInterface
 {
@@ -16,12 +17,12 @@ class FileTokenPersistence implements TokenPersistenceInterface
         $this->filepath = $filepath;
     }
 
-    public function saveToken(RawToken $token)
+    public function saveToken(TokenInterface $token)
     {
-        file_put_contents($this->filepath, json_encode($token->toArray()));
+        file_put_contents($this->filepath, json_encode($token->serialize()));
     }
 
-    public function restoreToken(callable $tokenFactory)
+    public function restoreToken(TokenInterface $token)
     {
         if (!file_exists($this->filepath)) {
             return null;
@@ -33,7 +34,7 @@ class FileTokenPersistence implements TokenPersistenceInterface
             return null;
         }
 
-        return $tokenFactory($data);
+        return $token->unserialize($data);
     }
 
     public function deleteToken()

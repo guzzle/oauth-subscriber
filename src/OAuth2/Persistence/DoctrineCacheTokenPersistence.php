@@ -3,7 +3,8 @@
 namespace GuzzleHttp\Subscriber\OAuth2\Persistence;
 
 use Doctrine\Common\Cache\Cache;
-use GuzzleHttp\Subscriber\OAuth2\RawToken;
+use GuzzleHttp\Subscriber\OAuth2\Token\RawToken;
+use GuzzleHttp\Subscriber\OAuth2\Token\TokenInterface;
 
 class DoctrineCacheTokenPersistence implements TokenPersistenceInterface
 {
@@ -23,12 +24,12 @@ class DoctrineCacheTokenPersistence implements TokenPersistenceInterface
         $this->cacheKey = $cacheKey;
     }
 
-    public function saveToken(RawToken $token)
+    public function saveToken(TokenInterface $token)
     {
-        $this->cache->save($this->cacheKey, $token->toArray());
+        $this->cache->save($this->cacheKey, $token->serialize());
     }
 
-    public function restoreToken(callable $tokenFactory)
+    public function restoreToken(TokenInterface $token)
     {
         $data = $this->cache->fetch($this->cacheKey);
 
@@ -36,7 +37,7 @@ class DoctrineCacheTokenPersistence implements TokenPersistenceInterface
             return null;
         }
 
-        return $tokenFactory($data);
+        return $token->unserialize($data);
     }
 
     public function deleteToken()

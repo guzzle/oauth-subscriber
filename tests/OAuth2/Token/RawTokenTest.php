@@ -1,9 +1,9 @@
 <?php
 
-namespace GuzzleHttp\Subscriber\OAuth2\Tests;
+namespace GuzzleHttp\Subscriber\OAuth2\Tests\Token;
 
 use PHPUnit_Framework_TestCase;
-use GuzzleHttp\Subscriber\OAuth2\RawToken;
+use GuzzleHttp\Subscriber\OAuth2\Token\RawToken;
 
 class RawTokenTest extends PHPUnit_Framework_TestCase
 {
@@ -22,7 +22,7 @@ class RawTokenTest extends PHPUnit_Framework_TestCase
         );
     }
 
-    public function testToArray()
+    public function testSerialize()
     {
         $token = new RawToken(
             self::$tokenData['access_token'],
@@ -30,7 +30,24 @@ class RawTokenTest extends PHPUnit_Framework_TestCase
             self::$tokenData['expires_at']
         );
 
-        $this->assertEquals(self::$tokenData, $token->toArray());
+        $this->assertEquals(self::$tokenData, $token->serialize());
+    }
+
+    public function testUnserialize()
+    {
+        $token = new RawToken(
+            self::$tokenData['access_token'],
+            self::$tokenData['refresh_token'],
+            self::$tokenData['expires_at']
+        );
+
+        $serialized = $token->serialize();
+        $restored_token = (new RawToken())->unserialize($serialized);
+
+        $this->assertEquals($token->getAccessToken(), $restored_token->getAccessToken());
+        $this->assertEquals($token->getRefreshToken(), $restored_token->getRefreshToken());
+        $this->assertEquals($token->getExpiresAt(), $restored_token->getExpiresAt());
+        $this->assertEquals($token->isExpired(), $restored_token->isExpired());
     }
 
     public function testGetters()

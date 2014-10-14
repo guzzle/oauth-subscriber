@@ -14,7 +14,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Message\Request;
 use GuzzleHttp\Message\Response;
 use GuzzleHttp\Subscriber\OAuth2\OAuth2Subscriber;
-use GuzzleHttp\Subscriber\OAuth2\RawToken;
+use GuzzleHttp\Subscriber\OAuth2\Token\RawToken;
 
 /**
  * OAuth2 plugin.

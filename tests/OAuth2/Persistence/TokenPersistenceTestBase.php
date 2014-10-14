@@ -3,8 +3,9 @@
 namespace GuzzleHttp\Subscriber\OAuth2\Tests\Persistence;
 
 use PHPUnit_Framework_TestCase;
-use GuzzleHttp\Subscriber\OAuth2\RawToken;
-use GuzzleHttp\Subscriber\OAuth2\Factory\GenericTokenFactory;
+use GuzzleHttp\Subscriber\OAuth2\Token\TokenInterface;
+use GuzzleHttp\Subscriber\OAuth2\Token\RawToken;
+use GuzzleHttp\Subscriber\OAuth2\Token\RawTokenFactory;
 
 abstract class TokenPersistenceTestBase extends PHPUnit_Framework_TestCase
 {
@@ -12,7 +13,7 @@ abstract class TokenPersistenceTestBase extends PHPUnit_Framework_TestCase
 
     public function testSaveToken()
     {
-        $factory = new GenericTokenFactory();
+        $factory = new RawTokenFactory();
         $token = $factory([
             'access_token' => 'abcdefghijklmnop',
             'refresh_token' => '0123456789abcdef',
@@ -23,7 +24,7 @@ abstract class TokenPersistenceTestBase extends PHPUnit_Framework_TestCase
 
     public function testRestoreToken()
     {
-        $factory = new GenericTokenFactory();
+        $factory = new RawTokenFactory();
         $token = $factory([
             'access_token' => 'abcdefghijklmnop',
             'refresh_token' => '0123456789abcdef',
@@ -31,18 +32,18 @@ abstract class TokenPersistenceTestBase extends PHPUnit_Framework_TestCase
         ]);
         $this->getInstance()->saveToken($token);
 
-        $restoredToken = $this->getInstance()->restoreToken($factory);
-        $this->assertInstanceOf('\GuzzleHttp\Subscriber\OAuth2\RawToken', $restoredToken);
+        $restoredToken = $this->getInstance()->restoreToken(new RawToken);
+        $this->assertInstanceOf('\GuzzleHttp\Subscriber\OAuth2\Token\RawToken', $restoredToken);
 
-        $token_before = $token->toArray();
-        $token_after = $restoredToken->toArray();
+        $token_before = $token->serialize();
+        $token_after = $restoredToken->serialize();
 
         $this->assertEquals($token_before, $token_after);
     }
 
     public function testDeleteToken()
     {
-        $factory = new GenericTokenFactory();
+        $factory = new RawTokenFactory();
         $token = $factory([
             'access_token' => 'abcdefghijklmnop',
             'refresh_token' => '0123456789abcdef',
@@ -53,34 +54,12 @@ abstract class TokenPersistenceTestBase extends PHPUnit_Framework_TestCase
 
         $persist->saveToken($token);
 
-        $restoredToken = $persist->restoreToken($factory);
-        $this->assertInstanceOf('\GuzzleHttp\Subscriber\OAuth2\RawToken', $restoredToken);
+        $restoredToken = $persist->restoreToken(new RawToken);
+        $this->assertInstanceOf('\GuzzleHttp\Subscriber\OAuth2\Token\RawToken', $restoredToken);
 
         $persist->deleteToken();
 
-        $restoredToken = $persist->restoreToken($factory);
+        $restoredToken = $persist->restoreToken(new RawToken);
         $this->assertNull($restoredToken);
-    }
-
-    public function testRestoreTokenCustomFactory()
-    {
-        $factory = function (array $data, RawToken $previousToken = null) {
-            $accessToken = strtoupper($data['access_token']);
-            $expiresAt = isset($data['expires_at'])? $data['expires_at']: time() + $data['expires_in'];
-
-            return new RawToken($accessToken, $data['refresh_token'], $expiresAt);
-        };
-
-        $token = $factory([
-            'access_token' => 'abcdefghijklmnop',
-            'refresh_token' => '0123456789abcdef',
-            'expires_in' => 3600,
-        ]);
-
-        $this->getInstance()->saveToken($token);
-
-        $restoredToken = $this->getInstance()->restoreToken($factory);
-        $this->assertInstanceOf('\GuzzleHttp\Subscriber\OAuth2\RawToken', $restoredToken);
-        $this->assertEquals('ABCDEFGHIJKLMNOP', $restoredToken->getAccessToken());
     }
 }

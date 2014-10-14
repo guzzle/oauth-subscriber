@@ -1,9 +1,12 @@
 <?php
 
-namespace GuzzleHttp\Subscriber\OAuth2;
+namespace GuzzleHttp\Subscriber\OAuth2\Token;
 
-class RawToken
+class RawToken implements Serializable, TokenInterface
 {
+    // Pull in serialize() and unserialize() methods
+    use TokenSerializer;
+
     /**
      * Access Token.
      *
@@ -30,25 +33,11 @@ class RawToken
      * @param string $refreshToken
      * @param int    $expiresAt
      */
-    public function __construct($accessToken, $refreshToken = null, $expiresAt = null)
+    public function __construct($accessToken = null, $refreshToken = null, $expiresAt = null)
     {
         $this->accessToken  = (string) $accessToken;
         $this->refreshToken = (string) $refreshToken;
         $this->expiresAt    = (int) $expiresAt;
-    }
-
-    /**
-     * Dump this object to an normalized array data.
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-        return [
-            'access_token'  => $this->accessToken,
-            'refresh_token' => $this->refreshToken,
-            'expires_at'    => $this->expiresAt,
-        ];
     }
 
     /**
