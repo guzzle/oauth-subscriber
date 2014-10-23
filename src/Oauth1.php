@@ -126,13 +126,14 @@ class Oauth1 implements SubscriberInterface
         // Add POST fields if the request uses POST fields and no files
         $body = $request->getBody();
         if ($body instanceof PostBodyInterface && !$body->getFiles()) {
-            $params += Query::fromString($body->getFields(true))->toArray();
+            $query = Query::fromString($body->getFields(true));
+            $params += $query->toArray();
         }
 
         // Parse & add query string parameters as base string parameters
-        $params += Query::fromString((string) $request->getQuery())
-            ->setEncodingType(Query::RFC1738)
-            ->toArray();
+        $query = Query::fromString((string) $request->getQuery());
+        $query->setEncodingType(Query::RFC1738);
+        $params += $query->toArray();
 
         $baseString = $this->createBaseString(
             $request,
@@ -183,7 +184,8 @@ class Oauth1 implements SubscriberInterface
     protected function createBaseString(RequestInterface $request, array $params)
     {
         // Remove query params from URL. Ref: Spec: 9.1.2.
-        $url = Url::fromString($request->getUrl())->setQuery('');
+        $url = Url::fromString($request->getUrl());
+        $url->setQuery('');
         $query = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
 
         return strtoupper($request->getMethod())
