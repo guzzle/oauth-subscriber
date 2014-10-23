@@ -2,7 +2,7 @@
 
 namespace GuzzleHttp\Tests\Oauth1;
 
-use GuzzleHttp\Adapter\Transaction;
+use GuzzleHttp\Transaction;
 use GuzzleHttp\Client;
 use GuzzleHttp\Event\BeforeEvent;
 use GuzzleHttp\Exception\ClientException;
