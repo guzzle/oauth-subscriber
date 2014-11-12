@@ -1,9 +1,29 @@
 <?php
-
 namespace GuzzleHttp\Subscriber\OAuth2\Token;
 
 trait TokenSerializer
 {
+    /**
+     * Access Token.
+     *
+     * @var string
+     */
+    private $accessToken;
+
+    /**
+     * Refresh Token.
+     *
+     * @var string
+     */
+    private $refreshToken;
+
+    /**
+     * Expiration timestamp.
+     *
+     * @var int
+     */
+    private $expiresAt;
+
     /**
      * Serialize Token data
      * @return array Token data

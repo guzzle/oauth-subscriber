@@ -1,5 +1,4 @@
 <?php
-
 namespace GuzzleHttp\Subscriber\OAuth2\Exception;
 
 use GuzzleHttp\Exception\TransferException;

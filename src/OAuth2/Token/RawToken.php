@@ -1,32 +1,10 @@
 <?php
-
 namespace GuzzleHttp\Subscriber\OAuth2\Token;
 
 class RawToken implements Serializable, TokenInterface
 {
     // Pull in serialize() and unserialize() methods
     use TokenSerializer;
-
-    /**
-     * Access Token.
-     *
-     * @var string
-     */
-    protected $accessToken;
-
-    /**
-     * Refresh Token.
-     *
-     * @var string
-     */
-    protected $refreshToken;
-
-    /**
-     * Expiration timestamp.
-     *
-     * @var int
-     */
-    protected $expiresAt;
 
     /**
      * @param string $accessToken

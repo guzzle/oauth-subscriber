@@ -1,5 +1,4 @@
 <?php
-
 namespace GuzzleHttp\Subscriber\OAuth2\Signer\AccessToken;
 
 use GuzzleHttp\Message\RequestInterface;

@@ -1,5 +1,4 @@
 <?php
-
 namespace GuzzleHttp\Subscriber\OAuth2\Persistence;
 
 use Doctrine\Common\Cache\Cache;
@@ -11,12 +10,12 @@ class DoctrineCacheTokenPersistence implements TokenPersistenceInterface
     /**
      * @var Cache
      */
-    protected $cache;
+    private $cache;
 
     /**
      * @var string
      */
-    protected $cacheKey;
+    private $cacheKey;
 
     public function __construct(Cache $cache, $cacheKey = 'guzzle-oauth2-token')
     {

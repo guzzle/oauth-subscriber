@@ -1,5 +1,4 @@
 <?php
-
 namespace GuzzleHttp\Subscriber\OAuth2\GrantType\Specific;
 
 use GuzzleHttp\Subscriber\OAuth2\Signer\ClientCredentials\SignerInterface;
@@ -19,14 +18,14 @@ class HWIOAuthBundleRefreshToken implements GrantTypeInterface
      *
      * @var SecurityContextInterface
      */
-    protected $securityContext;
+    private $securityContext;
 
     /**
      * HWIOAuthBundle OAuth2 ResourceOwnerMap.
      *
      * @var ResourceOwnerMap
      */
-    protected $resourceOwnerMap;
+    private $resourceOwnerMap;
 
     public function __construct(ResourceOwnerMap $resourceOwnerMap, SecurityContextInterface $securityContext)
     {

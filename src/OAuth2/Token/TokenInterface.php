@@ -1,5 +1,4 @@
 <?php
-
 namespace GuzzleHttp\Subscriber\OAuth2\Token;
 
 interface TokenInterface
@@ -15,7 +14,7 @@ interface TokenInterface
     public function getRefreshToken();
 
     /**
-     * @return int The expiration timestamp
+     * @return int The expiration date as a timestamp
      */
     public function getExpiresAt();
 

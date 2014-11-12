@@ -1,5 +1,4 @@
 <?php
-
 namespace GuzzleHttp\Subscriber\OAuth2\GrantType;
 
 use GuzzleHttp\Subscriber\OAuth2\TokenData;
@@ -9,6 +8,9 @@ interface GrantTypeInterface
 {
     /**
      * Get the token data returned by the OAuth2 server.
+     *
+     * @param SignerInterface $clientCredentialsSigner
+     * @param string          $refreshToken
      *
      * @return array
      */

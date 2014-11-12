@@ -1,5 +1,4 @@
 <?php
-
 namespace GuzzleHttp\Subscriber\OAuth2\GrantType;
 
 use GuzzleHttp\ClientInterface;
@@ -22,14 +21,14 @@ class PasswordCredentials implements GrantTypeInterface
      *
      * @var ClientInterface
      */
-    protected $client;
+    private $client;
 
     /**
      * Configuration settings.
      *
      * @var Collection
      */
-    protected $config;
+    private $config;
 
     public function __construct(ClientInterface $client, array $config)
     {

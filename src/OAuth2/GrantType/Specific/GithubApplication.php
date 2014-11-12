@@ -1,5 +1,4 @@
 <?php
-
 namespace GuzzleHttp\Subscriber\OAuth2\GrantType\Specific;
 
 use GuzzleHttp\ClientInterface;
@@ -23,14 +22,14 @@ class GithubApplication implements GrantTypeInterface
      *
      * @var ClientInterface
      */
-    protected $client;
+    private $client;
 
     /**
      * Configuration settings.
      *
      * @var Collection
      */
-    protected $config;
+    private $config;
 
     /**
      * @param ClientInterface $client

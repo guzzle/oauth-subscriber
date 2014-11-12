@@ -1,5 +1,4 @@
 <?php
-
 namespace GuzzleHttp\Subscriber\OAuth2;
 
 use GuzzleHttp\Event\BeforeEvent;
@@ -7,12 +6,10 @@ use GuzzleHttp\Event\ErrorEvent;
 use GuzzleHttp\Event\RequestEvents;
 use GuzzleHttp\Event\SubscriberInterface;
 use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Subscriber\OAuth2\GrantType\GrantTypeInterface;
 
 /**
  * OAuth2 plugin.
- *
- * @author Steve Kamerman <stevekamerman@gmail.com>
- * @author Matthieu Moquet <matthieu@moquet.net>
  *
  * @link http://tools.ietf.org/html/rfc6749 OAuth2 specification
  */
@@ -198,7 +195,9 @@ class OAuth2Subscriber implements SubscriberInterface
         if ($token instanceOf Token\TokenInterface) {
             $this->rawToken = $token;
         } else {
-            $this->rawToken = is_array($token) ? $this->tokenFactory($token) : $this->tokenFactory(['access_token' => $token]);
+            $this->rawToken = is_array($token) ?
+                $this->tokenFactory($token) :
+                $this->tokenFactory(['access_token' => $token]);
         }
 
         if ($this->rawToken === null) {

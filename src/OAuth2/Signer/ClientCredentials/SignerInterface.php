@@ -1,5 +1,4 @@
 <?php
-
 namespace GuzzleHttp\Subscriber\OAuth2\Signer\ClientCredentials;
 
 use GuzzleHttp\Message\RequestInterface;

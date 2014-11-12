@@ -1,5 +1,4 @@
 <?php
-
 namespace GuzzleHttp\Subscriber\OAuth2\Tests\GrantType;
 
 use PHPUnit_Framework_TestCase;

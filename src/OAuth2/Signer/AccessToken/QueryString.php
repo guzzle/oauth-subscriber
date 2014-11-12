@@ -1,12 +1,11 @@
 <?php
-
 namespace GuzzleHttp\Subscriber\OAuth2\Signer\AccessToken;
 
 use GuzzleHttp\Message\RequestInterface;
 
 class QueryString implements SignerInterface
 {
-    protected $fieldName;
+    private $fieldName;
 
     public function __construct($fieldName = 'access_token')
     {

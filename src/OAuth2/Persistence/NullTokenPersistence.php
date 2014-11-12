@@ -1,5 +1,4 @@
 <?php
-
 namespace GuzzleHttp\Subscriber\OAuth2\Persistence;
 
 use GuzzleHttp\Subscriber\OAuth2\Token\RawToken;
