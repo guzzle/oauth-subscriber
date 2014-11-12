@@ -1,8 +1,6 @@
 <?php
 namespace GuzzleHttp\Subscriber\OAuth2\Tests;
 
-use PHPUnit_Framework_TestCase;
-use GuzzleHttp\Adapter\Transaction;
 use GuzzleHttp\Client;
 use GuzzleHttp\Event\BeforeEvent;
 use GuzzleHttp\Event\ErrorEvent;
@@ -14,6 +12,8 @@ use GuzzleHttp\Message\Request;
 use GuzzleHttp\Message\Response;
 use GuzzleHttp\Subscriber\OAuth2\OAuth2Subscriber;
 use GuzzleHttp\Subscriber\OAuth2\Token\RawToken;
+use GuzzleHttp\Transaction;
+use PHPUnit_Framework_TestCase;
 
 /**
  * OAuth2 plugin.
@@ -234,8 +234,8 @@ class OAuth2SubscriberTest extends PHPUnit_Framework_TestCase
         $request = new Request('GET', '/', [], null, ['auth' => 'oauth']);
         $response = new Response(404);
         $transaction = new Transaction($client, $request);
-        $except = new RequestException('foo', $request, $response);
-        $event = new ErrorEvent($transaction, $except);
+        $event = new ErrorEvent($transaction);
+        $event->intercept($response);
 
         // Force an onError event, which triggers the signer and grant data processor
         $sub->onError($event);

@@ -67,19 +67,20 @@ class AuthorizationCode implements GrantTypeInterface
      */
     protected function getPostBody()
     {
-        $postBody = [
+        $postBody = new PostBody();
+        $postBody->replaceFields([
             'grant_type' => 'authorization_code',
             'code' => $this->config['code'],
-        ];
+        ]);
 
         if ($this->config['scope']) {
-            $postBody['scope'] = $this->config['scope'];
+            $postBody->setField('scope', $this->config['scope']);
         }
 
         if ($this->config['redirect_uri']) {
-            $postBody['redirect_uri'] = $this->config['redirect_uri'];
+            $postBody->setField('redirect_uri', $this->config['redirect_uri']);
         }
 
-        return (new PostBody())->replaceFields($postBody);
+        return $postBody;
     }
 }

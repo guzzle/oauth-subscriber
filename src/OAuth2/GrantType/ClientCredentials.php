@@ -69,14 +69,15 @@ class ClientCredentials implements GrantTypeInterface
      */
     protected function getPostBody()
     {
-        $postBody = [
+        $postBody = new PostBody();
+        $postBody->replaceFields([
             'grant_type' => 'client_credentials'
-        ];
+        ]);
 
         if ($this->config['scope']) {
-            $postBody['scope'] = $this->config['scope'];
+            $postBody->setField('scope', $this->config['scope']);
         }
 
-        return (new PostBody())->replaceFields($postBody);
+        return $postBody;
     }
 }

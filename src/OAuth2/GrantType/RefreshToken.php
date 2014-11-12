@@ -49,19 +49,20 @@ class RefreshToken implements GrantTypeInterface
 
     public function getRawData(SignerInterface $clientCredentialsSigner, $refreshToken = null)
     {
-        $postBody = [
+        $postBody = new PostBody();
+        $postBody->replaceFields([
             'grant_type' => 'refresh_token',
             // If no refresh token was provided to the method, use the one
             // provided to the constructor.
             'refresh_token' => $refreshToken ?: $this->config['refresh_token'],
-        ];
+        ]);
 
         if ($this->config['scope']) {
-            $postBody['scope'] = $this->config['scope'];
+            $postBody->setField('scope', $this->config['scope']);
         }
 
         $request = $this->client->createRequest('POST', null);
-        $request->setBody((new PostBody())->replaceFields($postBody));
+        $request->setBody($postBody);
         $clientCredentialsSigner->sign(
             $request,
             $this->config['client_id'],
