@@ -9,6 +9,7 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Message\Request;
 use GuzzleHttp\Post\PostBody;
 use GuzzleHttp\Subscriber\Oauth\Oauth1;
+use GuzzleHttp\Stream\Utils;
 
 class Oauth1Test extends \PHPUnit_Framework_TestCase
 {
@@ -267,7 +268,7 @@ class Oauth1Test extends \PHPUnit_Framework_TestCase
                 'stream' => true
             ]);
             $body = $response->getBody();
-            $data = $body::readLine($body);
+            $data = Utils::readLine($body);
             $this->assertContains('bieber', strtolower($data));
             $this->assertNotEmpty(json_decode($data, true));
             $body->close();
