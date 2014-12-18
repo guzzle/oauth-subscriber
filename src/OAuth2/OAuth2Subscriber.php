@@ -158,12 +158,12 @@ class OAuth2Subscriber implements SubscriberInterface
         $response = $event->getResponse();
 
         // Only sign requests using "auth"="oauth"
-        if ('oauth' !== $request->getConfig()['auth']) {
+        if ($request->getConfig()['auth'] !== 'oauth') {
             return;
         }
 
         // Only deal with Unauthorized response.
-        if ($response && 401 != $response->getStatusCode()) {
+        if ($response && $response->getStatusCode() != 401) {
             return;
         }
 
@@ -172,8 +172,17 @@ class OAuth2Subscriber implements SubscriberInterface
             return;
         }
 
+        // If there is a previous access token, it must have been used and failed
+        // so we will delete it from persistence so a new token will be requested.
+        // This happens when a key is invalidated before the expiration
+        if ($this->rawToken !== null) {
+            $this->tokenPersistence->deleteToken();
+            $this->rawToken = null;
+        }
+
         // Acquire a new access token, and retry the request.
-        if (null !== $accessToken = $this->getAccessToken()) {
+        $accessToken = $this->getAccessToken();
+        if ($accessToken !== null) {
             $newRequest = clone $request;
             $newRequest->setHeader('X-Guzzle-Retry', '1');
 
