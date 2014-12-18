@@ -135,11 +135,12 @@ class OAuth2Subscriber implements SubscriberInterface
         $request = $event->getRequest();
 
         // Only sign requests using "auth"="oauth"
-        if ('oauth' !== $request->getConfig()['auth']) {
+        if ($request->getConfig()['auth'] !== 'oauth') {
             return;
         }
 
-        if (null !== $accessToken = $this->getAccessToken()) {
+        $accessToken = $this->getAccessToken();
+        if ($accessToken !== null) {
             $this->accessTokenSigner->sign($request, $accessToken);
         }
     }
@@ -184,6 +185,8 @@ class OAuth2Subscriber implements SubscriberInterface
         $accessToken = $this->getAccessToken();
         if ($accessToken !== null) {
             $newRequest = clone $request;
+
+            // This prevents an infinite reauth loop
             $newRequest->setHeader('X-Guzzle-Retry', '1');
 
             $this->accessTokenSigner->sign($newRequest, $accessToken);
@@ -226,12 +229,12 @@ class OAuth2Subscriber implements SubscriberInterface
     public function getAccessToken()
     {
         // If token is not set try to get it from the persistent storage.
-        if (null === $this->rawToken) {
+        if ($this->rawToken === null) {
             $this->rawToken = $this->tokenPersistence->restoreToken(new Token\RawToken());
         }
 
         // If token is not set or expired then try to acquire a new one...
-        if (null === $this->rawToken || $this->rawToken->isExpired()) {
+        if ($this->rawToken === null || $this->rawToken->isExpired()) {
             $this->tokenPersistence->deleteToken();
 
             // Hydrate `rawToken` with a new access token
