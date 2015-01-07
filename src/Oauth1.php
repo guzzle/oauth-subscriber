@@ -141,16 +141,22 @@ class Oauth1 implements SubscriberInterface
         );
 
         // Implements double-dispatch to sign requests
-        $meth = [$this, 'sign_' . str_replace(
-            '-', '_', $this->config['signature_method']
-        )];
-
-        if (!is_callable($meth)) {
-            throw new \RuntimeException('Unknown signature method: '
-                . $this->config['signature_method']);
+        switch ($this->config['signature_method']) {
+            case Oauth1::SIGNATURE_METHOD_HMAC:
+                $signature = $this->signUsingHmacSha1($baseString);
+                break;
+            case Oauth1::SIGNATURE_METHOD_RSA:
+                $signature = $this->signUsingRsaSha1($baseString);
+                break;
+            case Oauth1::SIGNATURE_METHOD_PLAINTEXT:
+                $signature = $this->signUsingPlaintext($baseString);
+                break;
+            default:
+                throw new \RuntimeException('Unknown signature method: ' . $this->config['signature_method']);
+                break;
         }
 
-        return base64_encode(call_user_func($meth, $baseString, $this->config));
+        return base64_encode($signature);
     }
 
     /**
@@ -215,7 +221,12 @@ class Oauth1 implements SubscriberInterface
         return $data;
     }
 
-    private function sign_HMAC_SHA1($baseString)
+    /**
+     * @param string $baseString
+     *
+     * @return string
+     */
+    private function signUsingHmacSha1($baseString)
     {
         $key = rawurlencode($this->config['consumer_secret'])
             . '&' . rawurlencode($this->config['token_secret']);
@@ -223,7 +234,12 @@ class Oauth1 implements SubscriberInterface
         return hash_hmac('sha1', $baseString, $key, true);
     }
 
-    private function sign_RSA_SHA1($baseString)
+    /**
+     * @param string $baseString
+     *
+     * @return string
+     */
+    private function signUsingRsaSha1($baseString)
     {
         if (!function_exists('openssl_pkey_get_private')) {
             throw new \RuntimeException('RSA-SHA1 signature method '
@@ -235,14 +251,19 @@ class Oauth1 implements SubscriberInterface
             $this->config['consumer_secret']
         );
 
-        $signature = false;
+        $signature = '';
         openssl_sign($baseString, $signature, $privateKey);
         openssl_free_key($privateKey);
 
         return $signature;
     }
 
-    private function sign_PLAINTEXT($baseString)
+    /**
+     * @param string $baseString
+     *
+     * @return string
+     */
+    private function signUsingPlaintext($baseString)
     {
         return $baseString;
     }
