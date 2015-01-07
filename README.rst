@@ -66,3 +66,18 @@ the client using the client's ``defaults`` constructor option.
 .. note::
 
     You can omit the token and token_secret options to use two-legged OAuth.
+
+Using the RSA-SH1 signature method
+==================================
+
+.. code-block:: php
+
+    use GuzzleHttp\Subscriber\Oauth\Oauth1;
+
+    $oauth = new Oauth1([
+        'consumer_key'    => 'my_key',
+        'consumer_secret' => 'my_secret',
+        'private_key_file' => 'my_path_to_private_key_file',
+        'private_key_passphrase' => 'my_passphrase',
+        'signature_method' => Oauth1::SIGNATURE_METHOD_RSA,
+    ]);
