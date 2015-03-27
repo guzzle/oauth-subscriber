@@ -318,6 +318,7 @@ class Oauth1 implements SubscriberInterface
             'token'     => 'oauth_token',
             'verifier'  => 'oauth_verifier',
             'version'   => 'oauth_version'
+            'bodyhash'  => 'oauth_body_hash'
         ];
 
         foreach ($optionalParams as $optionName => $oauthName) {
