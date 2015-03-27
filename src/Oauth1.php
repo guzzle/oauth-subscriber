@@ -317,7 +317,7 @@ class Oauth1 implements SubscriberInterface
             'callback'  => 'oauth_callback',
             'token'     => 'oauth_token',
             'verifier'  => 'oauth_verifier',
-            'version'   => 'oauth_version'
+            'version'   => 'oauth_version',
             'bodyhash'  => 'oauth_body_hash'
         ];
 
