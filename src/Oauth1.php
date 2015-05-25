@@ -48,8 +48,10 @@ class Oauth1 implements SubscriberInterface
      * - callback: OAuth callback
      * - consumer_key: Consumer key string. Defaults to "anonymous".
      * - consumer_secret: Consumer secret. Defaults to "anonymous".
+     * - no_trailing_amp: Do not use trailing ampersand when token_secret is empty.
      * - private_key_file: The location of your private key file (RSA-SHA1 signature method only)
      * - private_key_passphrase: The passphrase for your private key file (RSA-SHA1 signature method only)
+     * - sub_array_strings: Convert sub-arrays to strings for consistent ordering of params.
      * - token: Client token
      * - token_secret: Client secret token
      * - verifier: OAuth verifier.
@@ -63,11 +65,13 @@ class Oauth1 implements SubscriberInterface
     public function __construct($config)
     {
         $this->config = Collection::fromConfig($config, [
-            'version'          => '1.0',
-            'request_method'   => self::REQUEST_METHOD_HEADER,
-            'consumer_key'     => 'anonymous',
-            'consumer_secret'  => 'anonymous',
-            'signature_method' => self::SIGNATURE_METHOD_HMAC,
+            'version'           => '1.0',
+            'request_method'    => self::REQUEST_METHOD_HEADER,
+            'consumer_key'      => 'anonymous',
+            'consumer_secret'   => 'anonymous',
+            'no_trailing_amp'   => false,
+            'signature_method'  => self::SIGNATURE_METHOD_HMAC,
+            'sub_array_strings' => false,
         ], ['signature_method', 'version', 'consumer_key', 'consumer_secret']);
     }
 
@@ -210,6 +214,18 @@ class Oauth1 implements SubscriberInterface
      */
     private function prepareParameters($data)
     {
+        //Filter sub-arrays and convert them to strings to proper ordering
+        if ($this->config['sub_array_strings']) {
+            foreach ($data as $key => $value) {
+                if (is_array($value)) {
+                    foreach ($value as $sub_key => $sub_value) {
+                        $data[$key . "[" . $sub_key . "]"] = $sub_value;
+                    }
+                    unset($data[$key]);
+                }
+            }
+        }
+
         // Parameters are sorted by name, using lexicographical byte value
         // ordering. Ref: Spec: 9.1.1 (1).
         uksort($data, 'strcmp');
@@ -230,8 +246,10 @@ class Oauth1 implements SubscriberInterface
      */
     private function signUsingHmacSha1($baseString)
     {
-        $key = rawurlencode($this->config['consumer_secret'])
-            . '&' . rawurlencode($this->config['token_secret']);
+        $key = rawurlencode($this->config['consumer_secret']);
+        if (!$this->config['no_trailing_amp'] || $this->config['token_secret']) {
+            $key .= '&' . rawurlencode($this->config['token_secret']);
+        }
 
         return hash_hmac('sha1', $baseString, $key, true);
     }
