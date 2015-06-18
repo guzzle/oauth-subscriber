@@ -12,11 +12,8 @@ matrix:
     - php: 7.0
   fast_finish: true
 
-before_script:
-  - curl --version
-
 install:
   - travis_retry composer self-update
-  - travis_retry composer install --no-interaction
+  - travis_retry composer install --no-interaction --prefer-source
 
 script: vendor/bin/phpunit
