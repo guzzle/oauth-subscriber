@@ -136,8 +136,8 @@ class Oauth1
         unset($params['oauth_signature']);
 
         // Add POST fields if the request uses POST fields and no files
-        $body = \GuzzleHttp\Psr7\parse_query($request->getBody()->getContents());
-        if (is_array($body) && count($body) > 1) {
+        if ($request->getHeaderLine('Content-Type') == 'application/x-www-form-urlencoded') {
+            $body = \GuzzleHttp\Psr7\parse_query($request->getBody()->getContents());
             $params += $body;
         }
 
