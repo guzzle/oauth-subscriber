@@ -21,20 +21,6 @@ class Oauth1Test extends \PHPUnit_Framework_TestCase
         'token_secret'    => 'dracula'
     ];
 
-    public function testFirst()
-    {
-        $stack = HandlerStack::create();
-
-        $middleware = new Oauth1($this->config);
-        $stack->push($middleware);
-
-        $client = new Client([
-            'handler' => $stack
-        ]);
-
-        $request = $client->put('http://requestb.in/1955mwl1', ['auth' => 'oauth', 'body' => '{"testing":"test123"}']);
-    }
-
     public function testAcceptsConfigurationData()
     {
         $p = new Oauth1($this->config);
