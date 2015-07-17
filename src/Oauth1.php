@@ -67,8 +67,7 @@ class Oauth1
             'signature_method' => self::SIGNATURE_METHOD_HMAC,
         ];
 
-        foreach ($config as $key => $value)
-        {
+        foreach ($config as $key => $value) {
             $this->config[$key] = $value;
         }
     }
@@ -84,14 +83,15 @@ class Oauth1
     {
         return function ($request, array $options) use ($handler) {
 
-            if (isset($options['auth']) && $options['auth'] == 'oauth')
+            if (isset($options['auth']) && $options['auth'] == 'oauth') {
                 $request = $this->onBefore($request);
+            }
 
             return $handler($request, $options);
         };
     }
 
-    public function onBefore(RequestInterface $request)
+    private function onBefore(RequestInterface $request)
     {
         $params = $this->getOauthParams(
             $this->generateNonce($request),
