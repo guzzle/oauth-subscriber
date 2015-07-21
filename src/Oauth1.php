@@ -108,8 +108,8 @@ class Oauth1
                 break;
             case self::REQUEST_METHOD_QUERY:
                 $queryparams = \GuzzleHttp\Psr7\parse_query($request->getUri()->getQuery());
-                $preparedParams = \GuzzleHttp\Psr7\build_query($oauthparams + $queryparams));
-                $request = $request->withUri($request->getUri()->withQuery($preparedParams);
+                $preparedParams = \GuzzleHttp\Psr7\build_query($oauthparams + $queryparams);
+                $request = $request->withUri($request->getUri()->withQuery($preparedParams));
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf(
