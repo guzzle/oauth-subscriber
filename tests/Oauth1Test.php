@@ -315,16 +315,16 @@ class Oauth1Test extends \PHPUnit_Framework_TestCase
 
     public function testTwitterIntegration()
     {
-        if (empty($_SERVER['OAUTH_CONSUMER_SECRET'])) {
+        if (empty(getenv('OAUTH_CONSUMER_SECRET'))) {
             $this->markTestSkipped('No OAUTH_CONSUMER_SECRET provided in phpunit.xml');
             return;
         }
 
         $config = $this->config;
-        $config['consumer_key']    = $_SERVER['OAUTH_CONSUMER_KEY'];
-        $config['consumer_secret'] = $_SERVER['OAUTH_CONSUMER_SECRET'];
-        $config['token']           = $_SERVER['OAUTH_TOKEN'];
-        $config['token_secret']    = $_SERVER['OAUTH_TOKEN_SECRET'];
+        $config['consumer_key']    = getenv('OAUTH_CONSUMER_KEY');
+        $config['consumer_secret'] = getenv('OAUTH_CONSUMER_SECRET');
+        $config['token']           = getenv('OAUTH_TOKEN');
+        $config['token_secret']    = getenv('OAUTH_TOKEN_SECRET');
 
         $stack = HandlerStack::create();
 
@@ -352,35 +352,40 @@ class Oauth1Test extends \PHPUnit_Framework_TestCase
 
     public function testTwitterStreamingIntegration()
     {
-        if (empty($_SERVER['OAUTH_CONSUMER_SECRET'])) {
+        if (empty(getenv('OAUTH_CONSUMER_SECRET'))) {
             $this->markTestSkipped('No OAUTH_CONSUMER_SECRET provided in phpunit.xml');
             return;
         }
 
+        $config = $this->config;
+        $config['consumer_key']    = $_SERVER['OAUTH_CONSUMER_KEY'];
+        $config['consumer_secret'] = $_SERVER['OAUTH_CONSUMER_SECRET'];
+        $config['token']           = $_SERVER['OAUTH_TOKEN'];
+        $config['token_secret']    = $_SERVER['OAUTH_TOKEN_SECRET'];
+
+        $stack = HandlerStack::create();
+
+        $middleware = new Oauth1($config);
+        $stack->push($middleware);
+
+        $container = [];
+        $history = Middleware::history($container);
+        $stack->push($history);
+
         $client = new Client([
-            'base_url' => 'https://stream.twitter.com/1.1/',
-            'defaults' => ['auth' => 'oauth']
+            'base_uri' => 'https://stream.twitter.com/1.1/',
+            'handler' => $stack,
+            'auth' => 'oauth'
         ]);
-
-        $oauth = new Oauth1([
-            'consumer_key'    => $_SERVER['OAUTH_CONSUMER_KEY'],
-            'consumer_secret' => $_SERVER['OAUTH_CONSUMER_SECRET'],
-            'token'           => $_SERVER['OAUTH_TOKEN'],
-            'token_secret'    => $_SERVER['OAUTH_TOKEN_SECRET']
-        ]);
-
-        $client->getEmitter()->attach($oauth);
 
         try {
             $response = $client->post('statuses/filter.json', [
-                'body'   => ['track' => 'bieber'],
+                'query'   => ['track' => 'bieber'],
                 'stream' => true
             ]);
-            $body = $response->getBody();
-            $data = Utils::readLine($body);
-            $this->assertContains('bieber', strtolower($data));
-            $this->assertNotEmpty(json_decode($data, true));
-            $body->close();
+            $body = $response->getBody()->getContents();
+            $this->assertContains('bieber', strtolower($body));
+            $this->assertNotEmpty(json_decode($body, true));
         } catch (ClientException $e) {
             if ($e->getResponse()->getStatusCode() == 429) {
                 $this->markTestIncomplete('You are being throttled');
