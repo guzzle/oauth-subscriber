@@ -308,7 +308,7 @@ class Oauth1
      *
      * @return array
      */
-    private function getOauthParams($nonce, $config)
+    private function getOauthParams($nonce, array $config)
     {
         $params = [
             'oauth_consumer_key'     => $config['consumer_key'],
