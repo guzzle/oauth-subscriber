@@ -93,21 +93,23 @@ class Oauth1
 
     private function onBefore(RequestInterface $request)
     {
-        $params = $this->getOauthParams(
+        $oauthparams = $this->getOauthParams(
             $this->generateNonce($request),
             $this->config
         );
 
-        $params['oauth_signature'] = $this->getSignature($request, $params);
-        uksort($params, 'strcmp');
+        $oauthparams['oauth_signature'] = $this->getSignature($request, $oauthparams);
+        uksort($oauthparams, 'strcmp');
 
         switch ($this->config['request_method']) {
             case self::REQUEST_METHOD_HEADER:
-                list($header, $value) = $this->buildAuthorizationHeader($params);
+                list($header, $value) = $this->buildAuthorizationHeader($oauthparams);
                 $request = $request->withHeader($header, $value);
                 break;
             case self::REQUEST_METHOD_QUERY:
-                $request = $request->withUri($request->getUri()->withQuery(\GuzzleHttp\Psr7\build_query($params)));
+                $queryparams = \GuzzleHttp\Psr7\parse_query($request->getUri()->getQuery());
+                $preparedParams = \GuzzleHttp\Psr7\build_query($oauthparams + $queryparams));
+                $request = $request->withUri($request->getUri()->withQuery($preparedParams);
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf(
