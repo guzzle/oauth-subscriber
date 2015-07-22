@@ -46,7 +46,7 @@ REST API:
     $stack->push($middleware);
 
     $client = new Client([
-        'base_url' => 'https://api.twitter.com/1.1/',
+        'base_uri' => 'https://api.twitter.com/1.1/',
         'handler' => $stack
     ]);
 
@@ -54,7 +54,7 @@ REST API:
     $res = $client->get('statuses/home_timeline.json', ['auth' => 'oauth']);
 
 You can set the ``auth`` request option to ``oauth`` for all requests sent by
-the client using the client's ``defaults`` constructor option.
+the client by extending the array you feed to ``new Client`` with auth => oauth.
 
 .. code-block:: php
 
@@ -73,9 +73,9 @@ the client using the client's ``defaults`` constructor option.
     $stack->push($middleware);
 
     $client = new Client([
-        'base_url' => 'https://api.twitter.com/1.1/',
+        'base_uri' => 'https://api.twitter.com/1.1/',
         'handler' => $stack,
-        'defaults' => ['auth' => 'oauth']
+        'auth' => 'oauth'
     ]);
 
     // Now you don't need to add the auth parameter
@@ -92,10 +92,19 @@ Using the RSA-SH1 signature method
 
     use GuzzleHttp\Subscriber\Oauth\Oauth1;
 
-    $oauth = new Oauth1([
+    $stack = HandlerStack::create();
+
+    $middleware = new Oauth1([
         'consumer_key'    => 'my_key',
         'consumer_secret' => 'my_secret',
         'private_key_file' => 'my_path_to_private_key_file',
         'private_key_passphrase' => 'my_passphrase',
         'signature_method' => Oauth1::SIGNATURE_METHOD_RSA,
     ]);
+    $stack->push($middleware);
+
+    $client = new Client([
+        'handler' => $stack
+    ]);
+
+    $response = $client->get('http://httpbin.org', ['auth' => 'oauth']);
