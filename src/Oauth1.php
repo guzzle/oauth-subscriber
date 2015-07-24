@@ -68,6 +68,7 @@ class Oauth1 implements SubscriberInterface
             'consumer_key'     => 'anonymous',
             'consumer_secret'  => 'anonymous',
             'signature_method' => self::SIGNATURE_METHOD_HMAC,
+            'signature_include_body' => true,
         ], ['signature_method', 'version', 'consumer_key', 'consumer_secret']);
     }
 
@@ -129,7 +130,9 @@ class Oauth1 implements SubscriberInterface
         $body = $request->getBody();
         if ($body instanceof PostBodyInterface && !$body->getFiles()) {
             $query = Query::fromString($body->getFields(true));
-            $params += $query->toArray();
+            if ($this->config['signature_include_body']) {
+                $params += $query->toArray();
+            }
         }
 
         // Parse & add query string parameters as base string parameters
