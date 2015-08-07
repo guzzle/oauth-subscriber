@@ -2,14 +2,11 @@
 
 namespace GuzzleHttp\Subscriber\Oauth;
 
-use GuzzleHttp\Collection;
-use GuzzleHttp\Event\RequestEvents;
-use GuzzleHttp\Event\SubscriberInterface;
-use GuzzleHttp\Event\BeforeEvent;
-use GuzzleHttp\Message\RequestInterface;
-use GuzzleHttp\Post\PostBodyInterface;
-use GuzzleHttp\Query;
-use GuzzleHttp\Url;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use GuzzleHttp\MessageFormatter;
+use GuzzleHttp\Promise;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * OAuth 1.0 signature plugin.
@@ -23,7 +20,7 @@ use GuzzleHttp\Url;
  *
  * @link http://oauth.net/core/1.0/#rfc.section.9.1.1 OAuth specification
  */
-class Oauth1 implements SubscriberInterface
+class Oauth1
 {
     /**
      * Consumer request method constants. See http://oauth.net/core/1.0/#consumer_req_param
@@ -35,7 +32,7 @@ class Oauth1 implements SubscriberInterface
     const SIGNATURE_METHOD_RSA       = 'RSA-SHA1';
     const SIGNATURE_METHOD_PLAINTEXT = 'PLAINTEXT';
 
-    /** @var Collection Configuration settings */
+    /** @var array Configuration settings */
     private $config;
 
     /**
@@ -62,44 +59,57 @@ class Oauth1 implements SubscriberInterface
      */
     public function __construct($config)
     {
-        $this->config = Collection::fromConfig($config, [
+        $this->config = [
             'version'          => '1.0',
             'request_method'   => self::REQUEST_METHOD_HEADER,
             'consumer_key'     => 'anonymous',
             'consumer_secret'  => 'anonymous',
             'signature_method' => self::SIGNATURE_METHOD_HMAC,
-        ], ['signature_method', 'version', 'consumer_key', 'consumer_secret']);
-    }
+        ];
 
-    public function getEvents()
-    {
-        return ['before' => ['onBefore', RequestEvents::SIGN_REQUEST]];
-    }
-
-    public function onBefore(BeforeEvent $event)
-    {
-        $request = $event->getRequest();
-
-        // Only sign requests using "auth"="oauth"
-        if ($request->getConfig()['auth'] != 'oauth') {
-            return;
+        foreach ($config as $key => $value) {
+            $this->config[$key] = $value;
         }
+    }
 
-        $params = $this->getOauthParams(
+    /**
+     * Called when the middleware is handled.
+     *
+     * @param callable $handler
+     *
+     * @return \Closure
+     */
+    public function __invoke(callable $handler)
+    {
+        return function ($request, array $options) use ($handler) {
+
+            if (isset($options['auth']) && $options['auth'] == 'oauth') {
+                $request = $this->onBefore($request);
+            }
+
+            return $handler($request, $options);
+        };
+    }
+
+    private function onBefore(RequestInterface $request)
+    {
+        $oauthparams = $this->getOauthParams(
             $this->generateNonce($request),
             $this->config
         );
 
-        $params['oauth_signature'] = $this->getSignature($request, $params);
-        uksort($params, 'strcmp');
+        $oauthparams['oauth_signature'] = $this->getSignature($request, $oauthparams);
+        uksort($oauthparams, 'strcmp');
 
         switch ($this->config['request_method']) {
             case self::REQUEST_METHOD_HEADER:
-                list($header, $value) = $this->buildAuthorizationHeader($params);
-                $request->setHeader($header, $value);
+                list($header, $value) = $this->buildAuthorizationHeader($oauthparams);
+                $request = $request->withHeader($header, $value);
                 break;
             case self::REQUEST_METHOD_QUERY:
-                $request->getQuery()->overwriteWith($params);
+                $queryparams = \GuzzleHttp\Psr7\parse_query($request->getUri()->getQuery());
+                $preparedParams = \GuzzleHttp\Psr7\build_query($oauthparams + $queryparams);
+                $request = $request->withUri($request->getUri()->withQuery($preparedParams));
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf(
@@ -107,6 +117,8 @@ class Oauth1 implements SubscriberInterface
                     $this->config['request_method']
                 ));
         }
+
+        return $request;
     }
 
     /**
@@ -126,16 +138,14 @@ class Oauth1 implements SubscriberInterface
         unset($params['oauth_signature']);
 
         // Add POST fields if the request uses POST fields and no files
-        $body = $request->getBody();
-        if ($body instanceof PostBodyInterface && !$body->getFiles()) {
-            $query = Query::fromString($body->getFields(true));
-            $params += $query->toArray();
+        if ($request->getHeaderLine('Content-Type') == 'application/x-www-form-urlencoded') {
+            $body = \GuzzleHttp\Psr7\parse_query($request->getBody()->getContents());
+            $params += $body;
         }
 
         // Parse & add query string parameters as base string parameters
-        $query = Query::fromString((string) $request->getQuery());
-        $query->setEncodingType(Query::RFC1738);
-        $params += $query->toArray();
+        $query = $request->getUri()->getQuery();
+        $params += \GuzzleHttp\Psr7\parse_query($query);
 
         $baseString = $this->createBaseString(
             $request,
@@ -173,7 +183,7 @@ class Oauth1 implements SubscriberInterface
      */
     public function generateNonce(RequestInterface $request)
     {
-        return sha1(uniqid('', true) . $request->getUrl());
+        return sha1(uniqid('', true) . $request->getUri()->getHost() . $request->getUri()->getPath());
     }
 
     /**
@@ -192,8 +202,7 @@ class Oauth1 implements SubscriberInterface
     protected function createBaseString(RequestInterface $request, array $params)
     {
         // Remove query params from URL. Ref: Spec: 9.1.2.
-        $url = Url::fromString($request->getUrl());
-        $url->setQuery('');
+        $url = $request->getUri()->withQuery('');
         $query = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
 
         return strtoupper($request->getMethod())
@@ -283,7 +292,7 @@ class Oauth1 implements SubscriberInterface
             $params[$key] = $key . '="' . rawurlencode($value) . '"';
         }
 
-        if ($this->config['realm']) {
+        if (isset($this->config['realm'])) {
             array_unshift(
                 $params,
                 'realm="' . rawurlencode($this->config['realm']) . '"'
@@ -297,11 +306,11 @@ class Oauth1 implements SubscriberInterface
      * Get the oauth parameters as named by the oauth spec
      *
      * @param string     $nonce  Unique nonce
-     * @param Collection $config Configuration options of the plugin.
+     * @param array      $config Configuration options of the plugin.
      *
      * @return array
      */
-    private function getOauthParams($nonce, Collection $config)
+    private function getOauthParams($nonce, array $config)
     {
         $params = [
             'oauth_consumer_key'     => $config['consumer_key'],
