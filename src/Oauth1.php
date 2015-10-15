@@ -66,7 +66,12 @@ class Oauth1
             'consumer_secret'  => 'anonymous',
             'signature_method' => self::SIGNATURE_METHOD_HMAC,
         ];
-
+        
+        $this->set($config);
+    }
+    
+    public function set($config)
+    {
         foreach ($config as $key => $value) {
             $this->config[$key] = $value;
         }
