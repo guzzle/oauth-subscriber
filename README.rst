@@ -37,7 +37,8 @@ REST API:
 
     $stack = HandlerStack::create();
 
-    $middleware = new Oauth1([
+    $middleware = new Oauth1();
+    $middleware->set([
         'consumer_key'    => 'my_key',
         'consumer_secret' => 'my_secret',
         'token'           => 'my_token',
@@ -64,7 +65,8 @@ the client by extending the array you feed to ``new Client`` with auth => oauth.
 
     $stack = HandlerStack::create();
 
-    $middleware = new Oauth1([
+    $middleware = new Oauth1();
+    $middleware->set([
         'consumer_key'    => 'my_key',
         'consumer_secret' => 'my_secret',
         'token'           => 'my_token',
@@ -94,7 +96,8 @@ Using the RSA-SH1 signature method
 
     $stack = HandlerStack::create();
 
-    $middleware = new Oauth1([
+    $middleware = new Oauth1();
+    $middleware->set([
         'consumer_key'    => 'my_key',
         'consumer_secret' => 'my_secret',
         'private_key_file' => 'my_path_to_private_key_file',
