@@ -1,6 +1,6 @@
 <?php
 
-namespace GuzzleHttp\Subscriber\Oauth;
+namespace GuzzleHttp\Middleware;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;

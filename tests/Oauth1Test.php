@@ -7,7 +7,7 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Subscriber\Oauth\Oauth1;
+use GuzzleHttp\Middleware\Oauth1;
 
 class Oauth1Test extends \PHPUnit_Framework_TestCase
 {
