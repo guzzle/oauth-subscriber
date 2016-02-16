@@ -1,19 +1,31 @@
 language: php
 
-php:
-  - 5.5
-  - 5.6
-  - 7.0
-  - hhvm
-
 matrix:
-  allow_failures:
-    - php: hhvm
-    - php: 7.0
-  fast_finish: true
+    include:
+        - php: 5.5
+        - php: 5.6
+        - php: 5.6
+        - php: 7.0
+        - php: hhvm
+
+cache:
+    directories:
+        - $HOME/.composer/cache
 
 install:
-  - travis_retry composer self-update
-  - travis_retry composer install --no-interaction --prefer-source
+    - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction
 
-script: vendor/bin/phpunit
+script:
+    - phpunit --verbose --coverage-clover build/logs/clover.xml
+    - phpenv config-rm xdebug.ini || return 0
+
+after_script:
+  - CODECLIMATE_REPO_TOKEN="8e0cd1566d8bcf657043858efb02e60ac953b34ee1ee4f5a19c5a9f4432c2d73" vendor/bin/test-reporter --stdout > codeclimate.json
+  - "curl -X POST -d @codeclimate.json -H 'Content-Type: application/json' -H 'User-Agent: Code Climate (PHP Test Reporter v0.1.1)' https://codeclimate.com/test_reports"
+
+addons:
+  code_climate:
+    repo_token: 8e0cd1566d8bcf657043858efb02e60ac953b34ee1ee4f5a19c5a9f4432c2d73
+
+after_success:
+    - php vendor/bin/coveralls -v

@@ -1,3 +1,8 @@
+[![Latest Stable Version](https://poser.pugx.org/serendipity_hq/guzzle-oauth1-middleware/v/stable)](https://packagist.org/packages/serendipity_hq/guzzle-oauth1-middleware)
+
+[![Total Downloads](https://poser.pugx.org/serendipity_hq/guzzle-oauth1-middleware/downloads)](https://packagist.org/packages/serendipity_hq/guzzle-oauth1-middleware)
+[![License](https://poser.pugx.org/serendipity_hq/guzzle-oauth1-middleware/license)](https://packagist.org/packages/serendipity_hq/guzzle-oauth1-middleware)
+
 =======================
 Guzzle OAuth Subscriber
 =======================
