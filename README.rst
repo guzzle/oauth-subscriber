@@ -17,7 +17,7 @@ composer.json:
 
     {
         "require": {
-            "guzzlehttp/oauth-subscriber": "0.2.*"
+            "serendipity_hq/guzzle-oauth1-middleware": "~0.3"
         }
     }
 
