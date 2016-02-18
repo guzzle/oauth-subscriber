@@ -59,6 +59,11 @@ class Oauth1
      */
     public function __construct($config)
     {
+        $this->setConfig($config);
+    }
+
+    public function setConfig($config)
+    {
         $this->config = [
             'version'          => '1.0',
             'request_method'   => self::REQUEST_METHOD_HEADER,
