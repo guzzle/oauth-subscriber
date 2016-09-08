@@ -29,6 +29,7 @@ class Oauth1
     const REQUEST_METHOD_QUERY  = 'query';
 
     const SIGNATURE_METHOD_HMAC      = 'HMAC-SHA1';
+    const SIGNATURE_METHOD_HMAC_SHA256 = 'HMAC-SHA256';
     const SIGNATURE_METHOD_RSA       = 'RSA-SHA1';
     const SIGNATURE_METHOD_PLAINTEXT = 'PLAINTEXT';
 
@@ -157,6 +158,9 @@ class Oauth1
             case Oauth1::SIGNATURE_METHOD_HMAC:
                 $signature = $this->signUsingHmacSha1($baseString);
                 break;
+            case Oauth1::SIGNATURE_METHOD_HMAC_SHA256:
+                $signature = $this->signUsingHmacSha256($baseString);
+                break;
             case Oauth1::SIGNATURE_METHOD_RSA:
                 $signature = $this->signUsingRsaSha1($baseString);
                 break;
@@ -243,6 +247,20 @@ class Oauth1
             . '&' . rawurlencode($this->config['token_secret']);
 
         return hash_hmac('sha1', $baseString, $key, true);
+    }
+
+    /**
+     * @param string $baseString
+     *
+     * @return string
+     */
+    private function signUsingHmacSha256($baseString)
+    {
+        $key = rawurlencode($this->config['consumer_secret'])
+            . '&' .
+            (isset($this->config['token_secret']) ? rawurlencode($this->config['token_secret']) : "");
+
+        return hash_hmac('sha256', $baseString, $key, true);
     }
 
     /**
