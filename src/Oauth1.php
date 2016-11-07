@@ -45,6 +45,7 @@ class Oauth1
      * - callback: OAuth callback
      * - consumer_key: Consumer key string. Defaults to "anonymous".
      * - consumer_secret: Consumer secret. Defaults to "anonymous".
+     * - private_key: Your private key as a string (RSA-SHA1 signature method only)
      * - private_key_file: The location of your private key file (RSA-SHA1 signature method only)
      * - private_key_passphrase: The passphrase for your private key file (RSA-SHA1 signature method only)
      * - token: Client token
@@ -257,8 +258,14 @@ class Oauth1
                 . 'requires the OpenSSL extension.');
         }
 
+        if (isset($this->config['private_key'])) {
+            $privateKeyData = $this->config['private_key'];
+        } else {
+            $privateKeyData = file_get_contents($this->config['private_key_file']);
+        }
+
         $privateKey = openssl_pkey_get_private(
-            file_get_contents($this->config['private_key_file']),
+            $privateKeyData,
             $this->config['private_key_passphrase']
         );
 
