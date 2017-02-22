@@ -299,7 +299,7 @@ class Oauth1
             );
         }
 
-        return ['Authorization', 'OAuth ' . implode(', ', $params)];
+        return ['Authorization', 'OAuth ' . implode(',', $params)];
     }
 
     /**
