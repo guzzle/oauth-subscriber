@@ -33,7 +33,7 @@ class Oauth1
     const SIGNATURE_METHOD_PLAINTEXT = 'PLAINTEXT';
 
     /** @var array Configuration settings */
-    private $config;
+    protected $config;
 
     /**
      * Create a new OAuth 1.0 plugin.
@@ -91,7 +91,14 @@ class Oauth1
         };
     }
 
-    private function onBefore(RequestInterface $request)
+    /**
+     * Modifies the request to add OAuth headers or querystring parameters.
+     *
+     * @param RequestInterface $request Request to authenticate.
+     *
+     * @return RequestInterface
+     */
+    protected function onBefore(RequestInterface $request)
     {
         $oauthparams = $this->getOauthParams(
             $this->generateNonce($request),
