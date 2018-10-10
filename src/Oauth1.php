@@ -203,7 +203,7 @@ class Oauth1
     {
         // Remove query params from URL. Ref: Spec: 9.1.2.
         $url = $request->getUri()->withQuery('');
-        $query = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
+        $query = \GuzzleHttp\Psr7\build_query($params, PHP_QUERY_RFC3986);
 
         return strtoupper($request->getMethod())
             . '&' . rawurlencode($url)
