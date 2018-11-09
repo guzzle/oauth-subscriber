@@ -208,10 +208,20 @@ class Oauth1
     {
         // Remove query params from URL. Ref: Spec: 9.1.2.
         $url = $request->getUri()->withQuery('');
+        $urlString = (string)$url;
+
+        $headerHost = $request->getHeader('Host');
+
+        if ($headerHost && is_array($headerHost) && isset($headerHost[0])) {
+            $host = $request->getUri()->getHost();
+
+            $urlString = str_replace('//'.$host, '//'.$headerHost[0], $urlString);
+        }
+
         $query = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
 
         return strtoupper($request->getMethod())
-            . '&' . rawurlencode($url)
+            . '&' . rawurlencode($urlString)
             . '&' . rawurlencode($query);
     }
 
