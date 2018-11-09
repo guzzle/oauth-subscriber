@@ -104,6 +104,11 @@ class Oauth1
         switch ($this->config['request_method']) {
             case self::REQUEST_METHOD_HEADER:
                 list($header, $value) = $this->buildAuthorizationHeader($oauthparams);
+
+                if ($request->getHeader($header)) {
+                    $value = $request->getHeader($header)[0].', '.$value;
+                }
+
                 $request = $request->withHeader($header, $value);
                 break;
             case self::REQUEST_METHOD_QUERY:
