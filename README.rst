@@ -83,7 +83,7 @@ the client by extending the array you feed to ``new Client`` with auth => oauth.
 
 .. note::
 
-    You can omit the token and token_secret options to use two-legged OAuth.
+    You can set the ``token`` and ``token_secret`` options to an empty string to use two-legged OAuth.
 
 Using the RSA-SH1 signature method
 ==================================
