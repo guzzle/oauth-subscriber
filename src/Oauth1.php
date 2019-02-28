@@ -293,7 +293,7 @@ class Oauth1
      *
      * @return array
      */
-    private function buildAuthorizationHeader(array $params)
+    protected function buildAuthorizationHeader(array $params)
     {
         foreach ($params as $key => $value) {
             $params[$key] = $key . '="' . rawurlencode($value) . '"';
@@ -317,7 +317,7 @@ class Oauth1
      *
      * @return array
      */
-    private function getOauthParams($nonce, array $config)
+    protected function getOauthParams($nonce, array $config)
     {
         $params = [
             'oauth_consumer_key'     => $config['consumer_key'],
