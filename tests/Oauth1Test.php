@@ -8,8 +8,9 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Subscriber\Oauth\Oauth1;
+use PHPUnit\Framework\TestCase;
 
-class Oauth1Test extends \PHPUnit_Framework_TestCase
+class Oauth1Test extends TestCase
 {
     const TIMESTAMP = '1327274290';
     const NONCE = 'e7aa11195ca58349bec8b5ebe351d3497eb9e603';
@@ -316,7 +317,7 @@ class Oauth1Test extends \PHPUnit_Framework_TestCase
     public function testTwitterIntegration()
     {
         if (empty(getenv('OAUTH_CONSUMER_SECRET'))) {
-            $this->markTestSkipped('No OAUTH_CONSUMER_SECRET provided in phpunit.xml');
+            $this->markTestSkipped('No OAUTH_CONSphp UMER_SECRET provided in phpunit.xml');
             return;
         }
 
