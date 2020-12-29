@@ -317,7 +317,7 @@ class Oauth1Test extends TestCase
     public function testTwitterIntegration()
     {
         if (empty(getenv('OAUTH_CONSUMER_SECRET'))) {
-            $this->markTestSkipped('No OAUTH_CONSphp UMER_SECRET provided in phpunit.xml');
+            $this->markTestSkipped('No OAUTH_CONSUMER_SECRET provided in phpunit.xml');
             return;
         }
 
