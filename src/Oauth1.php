@@ -264,7 +264,7 @@ class Oauth1
 
         $signature = '';
         openssl_sign($baseString, $signature, $privateKey);
-        openssl_free_key($privateKey);
+        unset($privateKey);
 
         return $signature;
     }
