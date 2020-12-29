@@ -96,8 +96,8 @@ class Oauth1Test extends TestCase
         $request = $container[0]['request'];
 
         $this->assertTrue($request->hasHeader('Authorization'));
-        $this->assertContains('oauth_signature_method="PLAINTEXT"', $request->getHeader('Authorization')[0]);
-        $this->assertContains('oauth_signature="', $request->getHeader('Authorization')[0]);
+        $this->assertStringContainsString('oauth_signature_method="PLAINTEXT"', $request->getHeader('Authorization')[0]);
+        $this->assertStringContainsString('oauth_signature="', $request->getHeader('Authorization')[0]);
     }
 
     public function testSignsOauthRequestsInHeader()
@@ -128,7 +128,7 @@ class Oauth1Test extends TestCase
             'oauth_signature_method', 'oauth_timestamp', 'oauth_token',
             'oauth_version'];
         foreach ($check as $name) {
-            $this->assertContains($name . '=', $request->getHeader('Authorization')[0]);
+            $this->assertStringContainsString($name . '=', $request->getHeader('Authorization')[0]);
         }
     }
 
@@ -193,11 +193,10 @@ class Oauth1Test extends TestCase
         $this->assertEmpty($request->getHeader('Authorization'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testValidatesRequestMethod()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $stack = HandlerStack::create();
 
         $config = $this->config;
@@ -213,11 +212,10 @@ class Oauth1Test extends TestCase
         $client->get('http://httpbin.org', ['auth' => 'oauth']);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testExceptionOnSignatureError()
     {
+        $this->expectException(\RuntimeException::class);
+
         $stack = HandlerStack::create();
 
         $config = $this->config;
@@ -257,7 +255,7 @@ class Oauth1Test extends TestCase
         $request = $container[0]['request'];
 
         $this->assertTrue($request->hasHeader('Authorization'));
-        $this->assertNotContains('oauth_token=', $request->getHeader('Authorization')[0]);
+        $this->assertStringNotContainsString('oauth_token=', $request->getHeader('Authorization')[0]);
     }
 
     public function testRandomParametersAreNotAutomaticallyAdded()
@@ -284,7 +282,7 @@ class Oauth1Test extends TestCase
         $request = $container[0]['request'];
 
         $this->assertTrue($request->hasHeader('Authorization'));
-        $this->assertNotContains('foo=bar', $request->getHeader('Authorization')[0]);
+        $this->assertStringNotContainsString('foo=bar', $request->getHeader('Authorization')[0]);
     }
 
     public function testAllowsRealm()
@@ -311,7 +309,7 @@ class Oauth1Test extends TestCase
         $request = $container[0]['request'];
 
         $this->assertTrue($request->hasHeader('Authorization'));
-        $this->assertContains('OAuth realm="foo",', $request->getHeader('Authorization')[0]);
+        $this->assertStringContainsString('OAuth realm="foo",', $request->getHeader('Authorization')[0]);
     }
 
     public function testTwitterIntegration()
@@ -385,7 +383,7 @@ class Oauth1Test extends TestCase
                 'stream' => true
             ]);
             $body = $response->getBody()->getContents();
-            $this->assertContains('bieber', strtolower($body));
+            $this->assertStringContainsString('bieber', strtolower($body));
             $this->assertNotEmpty(json_decode($body, true));
         } catch (ClientException $e) {
             if ($e->getResponse()->getStatusCode() == 429) {
