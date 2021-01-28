@@ -21,6 +21,8 @@ matrix:
           dist: bionic
         - php: 7.4
           dist: bionic
+        - php: 8.0
+          dist: focal
     fast_finish: true
 
 before_install:
