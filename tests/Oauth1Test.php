@@ -404,4 +404,32 @@ class Oauth1Test extends TestCase
             }
         }
     }
+
+    public function testSignsHmacSha256()
+    {
+        $config = $this->config;
+        $config['signature_method'] = Oauth1::SIGNATURE_METHOD_HMACSHA256;
+
+        $stack = HandlerStack::create();
+
+        $middleware = new Oauth1($config);
+        $stack->push($middleware);
+
+        $container = [];
+        $history = Middleware::history($container);
+        $stack->push($history);
+
+        $client = new Client([
+            'handler' => $stack
+        ]);
+
+        $client->get('http://httpbin.org', ['auth' => 'oauth']);
+
+        /* @var Request $request */
+        $request = $container[0]['request'];
+
+        $this->assertTrue($request->hasHeader('Authorization'));
+        $this->assertContains('oauth_signature_method="HMAC-SHA256"', $request->getHeader('Authorization')[0]);
+        $this->assertContains('oauth_signature="', $request->getHeader('Authorization')[0]);
+    }
 }

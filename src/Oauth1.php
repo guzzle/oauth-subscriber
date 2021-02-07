@@ -28,9 +28,10 @@ class Oauth1
     const REQUEST_METHOD_HEADER = 'header';
     const REQUEST_METHOD_QUERY  = 'query';
 
-    const SIGNATURE_METHOD_HMAC      = 'HMAC-SHA1';
-    const SIGNATURE_METHOD_RSA       = 'RSA-SHA1';
-    const SIGNATURE_METHOD_PLAINTEXT = 'PLAINTEXT';
+    const SIGNATURE_METHOD_HMAC       = 'HMAC-SHA1';
+    const SIGNATURE_METHOD_HMACSHA256 = 'HMAC-SHA256';
+    const SIGNATURE_METHOD_RSA        = 'RSA-SHA1';
+    const SIGNATURE_METHOD_PLAINTEXT  = 'PLAINTEXT';
 
     /** @var array Configuration settings */
     private $config;
@@ -155,7 +156,10 @@ class Oauth1
         // Implements double-dispatch to sign requests
         switch ($this->config['signature_method']) {
             case Oauth1::SIGNATURE_METHOD_HMAC:
-                $signature = $this->signUsingHmacSha1($baseString);
+                $signature = $this->signUsingHmac('sha1', $baseString);
+                break;
+            case Oauth1::SIGNATURE_METHOD_HMACSHA256:
+                $signature = $this->signUsingHmac('sha256', $baseString);
                 break;
             case Oauth1::SIGNATURE_METHOD_RSA:
                 $signature = $this->signUsingRsaSha1($baseString);
@@ -233,18 +237,19 @@ class Oauth1
     }
 
     /**
+     * @param string $algo Name of selected hashing algorithm (i.e. "md5", "sha256", "haval160,4", etc..)
      * @param string $baseString
      *
      * @return string
      */
-    private function signUsingHmacSha1($baseString)
+    private function signUsingHmac($algo, $baseString)
     {
         $key = rawurlencode($this->config['consumer_secret']) . '&';
         if (isset($this->config['token_secret'])) {
             $key .= rawurlencode($this->config['token_secret']);
         }
 
-        return hash_hmac('sha1', $baseString, $key, true);
+        return hash_hmac($algo, $baseString, $key, true);
     }
 
     /**
