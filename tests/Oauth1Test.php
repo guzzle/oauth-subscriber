@@ -8,8 +8,10 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Subscriber\Oauth\Oauth1;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 
-class Oauth1Test extends \PHPUnit_Framework_TestCase
+class Oauth1Test extends TestCase
 {
     const TIMESTAMP = '1327274290';
     const NONCE = 'e7aa11195ca58349bec8b5ebe351d3497eb9e603';
@@ -95,8 +97,8 @@ class Oauth1Test extends \PHPUnit_Framework_TestCase
         $request = $container[0]['request'];
 
         $this->assertTrue($request->hasHeader('Authorization'));
-        $this->assertContains('oauth_signature_method="PLAINTEXT"', $request->getHeader('Authorization')[0]);
-        $this->assertContains('oauth_signature="', $request->getHeader('Authorization')[0]);
+        $this->assertThat($request->getHeader('Authorization')[0],Assert::stringContains('oauth_signature_method="PLAINTEXT"',false),'');
+        $this->assertThat($request->getHeader('Authorization')[0],Assert::stringContains('oauth_signature="',false),'');
     }
 
     public function testSignsOauthRequestsInHeader()
@@ -127,7 +129,7 @@ class Oauth1Test extends \PHPUnit_Framework_TestCase
             'oauth_signature_method', 'oauth_timestamp', 'oauth_token',
             'oauth_version'];
         foreach ($check as $name) {
-            $this->assertContains($name . '=', $request->getHeader('Authorization')[0]);
+            $this->assertThat($request->getHeader('Authorization')[0],Assert::stringContains($name . '=',false),'');
         }
     }
 
@@ -197,6 +199,10 @@ class Oauth1Test extends \PHPUnit_Framework_TestCase
      */
     public function testValidatesRequestMethod()
     {
+        if (method_exists($this,'expectException')) {
+            $this->expectException(\InvalidArgumentException::class);
+        }
+
         $stack = HandlerStack::create();
 
         $config = $this->config;
@@ -217,6 +223,10 @@ class Oauth1Test extends \PHPUnit_Framework_TestCase
      */
     public function testExceptionOnSignatureError()
     {
+        if (method_exists($this,'expectException')) {
+            $this->expectException(\RuntimeException::class);
+        }
+
         $stack = HandlerStack::create();
 
         $config = $this->config;
@@ -256,7 +266,7 @@ class Oauth1Test extends \PHPUnit_Framework_TestCase
         $request = $container[0]['request'];
 
         $this->assertTrue($request->hasHeader('Authorization'));
-        $this->assertNotContains('oauth_token=', $request->getHeader('Authorization')[0]);
+        $this->assertThat($request->getHeader('Authorization')[0],Assert::logicalNot(Assert::stringContains('oauth_token=',false)),'');
     }
 
     public function testRandomParametersAreNotAutomaticallyAdded()
@@ -283,7 +293,7 @@ class Oauth1Test extends \PHPUnit_Framework_TestCase
         $request = $container[0]['request'];
 
         $this->assertTrue($request->hasHeader('Authorization'));
-        $this->assertNotContains('foo=bar', $request->getHeader('Authorization')[0]);
+        $this->assertThat($request->getHeader('Authorization')[0],Assert::logicalNot(Assert::stringContains('foo=bar',false)),'');
     }
 
     public function testAllowsRealm()
@@ -310,7 +320,7 @@ class Oauth1Test extends \PHPUnit_Framework_TestCase
         $request = $container[0]['request'];
 
         $this->assertTrue($request->hasHeader('Authorization'));
-        $this->assertContains('OAuth realm="foo",', $request->getHeader('Authorization')[0]);
+        $this->assertThat($request->getHeader('Authorization')[0],Assert::stringContains('OAuth realm="foo",',false),'');
     }
 
     public function testTwitterIntegration()
@@ -384,7 +394,7 @@ class Oauth1Test extends \PHPUnit_Framework_TestCase
                 'stream' => true
             ]);
             $body = $response->getBody()->getContents();
-            $this->assertContains('bieber', strtolower($body));
+            $this->assertThat(strtolower($body),Assert::stringContains('bieber',false),'');
             $this->assertNotEmpty(json_decode($body, true));
         } catch (ClientException $e) {
             if ($e->getResponse()->getStatusCode() == 429) {
