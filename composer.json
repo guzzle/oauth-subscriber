@@ -25,5 +25,8 @@
         "branch-alias": {
             "dev-master": "0.4-dev"
         }
+    },
+    "suggest": {
+        "ext-openssl": "Required to sign using RSA-SHA1"
     }
 }
