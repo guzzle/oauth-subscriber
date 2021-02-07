@@ -239,8 +239,10 @@ class Oauth1
      */
     private function signUsingHmacSha1($baseString)
     {
-        $key = rawurlencode($this->config['consumer_secret'])
-            . '&' . rawurlencode($this->config['token_secret']);
+        $key = rawurlencode($this->config['consumer_secret']) . '&';
+        if (isset($this->config['token_secret'])) {
+            $key .= rawurlencode($this->config['token_secret']);
+        }
 
         return hash_hmac('sha1', $baseString, $key, true);
     }
