@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.5.0 - 2021-02-08
+## 0.5.0 - 2021-02-17
 
 * Add oauth_body_hash parameter to authorization header
 * Do not require token_secret for 2-legged authentication
