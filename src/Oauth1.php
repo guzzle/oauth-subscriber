@@ -106,7 +106,7 @@ class Oauth1
                 break;
             case self::REQUEST_METHOD_QUERY:
                 $queryParams = Query::parse($request->getUri()->getQuery());
-                $preparedParams = Query::parse($oauthparams + $queryParams);
+                $preparedParams = Query::build($oauthparams + $queryParams);
                 $request = $request->withUri($request->getUri()->withQuery($preparedParams));
                 break;
             default:
