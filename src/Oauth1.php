@@ -2,11 +2,8 @@
 
 namespace GuzzleHttp\Subscriber\Oauth;
 
+use GuzzleHttp\Psr7\Query;
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use GuzzleHttp\MessageFormatter;
-use GuzzleHttp\Promise;
-use Psr\Http\Message\StreamInterface;
 
 /**
  * OAuth 1.0 signature plugin.
@@ -108,8 +105,8 @@ class Oauth1
                 $request = $request->withHeader($header, $value);
                 break;
             case self::REQUEST_METHOD_QUERY:
-                $queryparams = \GuzzleHttp\Psr7\parse_query($request->getUri()->getQuery());
-                $preparedParams = \GuzzleHttp\Psr7\build_query($oauthparams + $queryparams);
+                $queryParams = Query::parse($request->getUri()->getQuery());
+                $preparedParams = Query::build($oauthparams + $queryParams);
                 $request = $request->withUri($request->getUri()->withQuery($preparedParams));
                 break;
             default:
@@ -139,14 +136,14 @@ class Oauth1
         unset($params['oauth_signature']);
 
         // Add POST fields if the request uses POST fields and no files
-        if ($request->getHeaderLine('Content-Type') == 'application/x-www-form-urlencoded') {
-            $body = \GuzzleHttp\Psr7\parse_query($request->getBody()->getContents());
+        if ($request->getHeaderLine('Content-Type') === 'application/x-www-form-urlencoded') {
+            $body = Query::parse($request->getBody()->getContents());
             $params += $body;
         }
 
         // Parse & add query string parameters as base string parameters
         $query = $request->getUri()->getQuery();
-        $params += \GuzzleHttp\Psr7\parse_query($query);
+        $params += Query::parse($query);
 
         $baseString = $this->createBaseString(
             $request,
