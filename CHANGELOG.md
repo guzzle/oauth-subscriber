@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.6.0 - 2021-07-13
+
+* Added support for `guzzlehttp/psr7:^2.0`
+
 ## 0.5.0 - 2021-02-17
 
 * Add oauth_body_hash parameter to authorization header
