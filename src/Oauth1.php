@@ -50,7 +50,7 @@ class Oauth1
      * - verifier: OAuth verifier.
      * - version: OAuth version. Defaults to '1.0'.
      * - realm: OAuth realm.
-     * - signature_method: Signature method. One of 'HMAC-SHA1', 'RSA-SHA1', or
+     * - signature_method: Signature method. One of 'HMAC-SHA1', 'HMAC-SHA256', 'RSA-SHA1', or
      *   'PLAINTEXT'. Defaults to 'HMAC-SHA1'.
      *
      * @param array $config Configuration array.
