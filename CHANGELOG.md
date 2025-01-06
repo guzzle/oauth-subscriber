@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.7.0 - UPCOMING
+
+* Dropped support for HHVM and PHP <7.2.5
+* Added support for PHP 8.1, 8.2, 8.3, 8.4
+
 ## 0.6.0 - 2021-07-13
 
 * Added support for `guzzlehttp/psr7:^2.0`
