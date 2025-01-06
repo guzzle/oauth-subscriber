@@ -46,15 +46,17 @@ class Oauth1
      * - callback: OAuth callback
      * - consumer_key: Consumer key string. Defaults to "anonymous".
      * - consumer_secret: Consumer secret. Defaults to "anonymous".
-     * - private_key_file: The location of your private key file (RSA-SHA1 signature method only)
-     * - private_key_passphrase: The passphrase for your private key file (RSA-SHA1 signature method only)
+     * - private_key_file: The location of your private key file (RSA-SHA1
+     *   signature method only)
+     * - private_key_passphrase: The passphrase for your private key file
+     *   (RSA-SHA1 signature method only)
      * - token: Client token
      * - token_secret: Client secret token
      * - verifier: OAuth verifier.
      * - version: OAuth version. Defaults to '1.0'.
      * - realm: OAuth realm.
-     * - signature_method: Signature method. One of 'HMAC-SHA1', 'RSA-SHA1', or
-     *   'PLAINTEXT'. Defaults to 'HMAC-SHA1'.
+     * - signature_method: Signature method. One of 'HMAC-SHA1', 'RSA-SHA1',
+     *   'HMAC-SHA256', or 'PLAINTEXT'. Defaults to 'HMAC-SHA1'.
      *
      * @param array $config Configuration array.
      */
