@@ -58,7 +58,7 @@ class Oauth1
      *
      * @param array $config Configuration array.
      */
-    public function __construct($config)
+    public function __construct(array $config)
     {
         $this->config = [
             'version' => '1.0',
@@ -219,7 +219,7 @@ class Oauth1
      *
      * @return array
      */
-    private function prepareParameters($data)
+    private function prepareParameters(array $data)
     {
         // Parameters are sorted by name, using lexicographical byte value
         // ordering. Ref: Spec: 9.1.1 (1).
@@ -235,12 +235,11 @@ class Oauth1
     }
 
     /**
-     * @param string $algo       Name of selected hashing algorithm (i.e. "md5", "sha256", "haval160,4", etc..)
-     * @param string $baseString
+     * @param string $algo Name of selected hashing algorithm (i.e. "md5", "sha256", "haval160,4", etc..)
      *
      * @return string
      */
-    private function signUsingHmac($algo, $baseString)
+    private function signUsingHmac(string $algo, string $baseString)
     {
         $key = rawurlencode($this->config['consumer_secret']).'&';
         if (isset($this->config['token_secret'])) {
@@ -251,11 +250,9 @@ class Oauth1
     }
 
     /**
-     * @param string $baseString
-     *
      * @return string
      */
-    private function signUsingRsaSha1($baseString)
+    private function signUsingRsaSha1(string $baseString)
     {
         if (!function_exists('openssl_pkey_get_private')) {
             throw new \RuntimeException('RSA-SHA1 signature method '
@@ -275,11 +272,9 @@ class Oauth1
     }
 
     /**
-     * @param string $baseString
-     *
      * @return string
      */
-    private function signUsingPlaintext($baseString)
+    private function signUsingPlaintext(string $baseString)
     {
         return $baseString;
     }
@@ -315,7 +310,7 @@ class Oauth1
      *
      * @return array
      */
-    private function getOauthParams($nonce, array $config)
+    private function getOauthParams(string $nonce, array $config)
     {
         $params = [
             'oauth_consumer_key' => $config['consumer_key'],
