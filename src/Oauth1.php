@@ -100,10 +100,7 @@ class Oauth1
      */
     private function onBefore(RequestInterface $request): RequestInterface
     {
-        $oauthparams = self::getOauthParams(
-            $this->generateNonce($request),
-            $this->config
-        );
+        $oauthparams = self::getOauthParams($this->config);
 
         $oauthparams['oauth_signature'] = $this->getSignature($request, $oauthparams);
         uksort($oauthparams, 'strcmp');
@@ -177,19 +174,6 @@ class Oauth1
         }
 
         return base64_encode($signature);
-    }
-
-    /**
-     * Returns a Nonce Based on the unique id and URL.
-     *
-     * This will allow for multiple requests in parallel with the same exact
-     * timestamp to use separate nonce's.
-     *
-     * @param RequestInterface $request Request to generate a nonce for
-     */
-    private static function generateNonce(RequestInterface $request): string
-    {
-        return sha1(uniqid('', true).$request->getUri()->getHost().$request->getUri()->getPath());
     }
 
     /**
@@ -296,14 +280,13 @@ class Oauth1
     /**
      * Get the oauth parameters as named by the oauth spec
      *
-     * @param string $nonce  Unique nonce
-     * @param array  $config Configuration options of the plugin.
+     * @param array $config Configuration options of the plugin.
      */
-    private static function getOauthParams(string $nonce, array $config): array
+    private static function getOauthParams(array $config): array
     {
         $params = [
             'oauth_consumer_key' => $config['consumer_key'],
-            'oauth_nonce' => $nonce,
+            'oauth_nonce' => bin2hex(random_bytes(20)),
             'oauth_signature_method' => $config['signature_method'],
             'oauth_timestamp' => time(),
         ];

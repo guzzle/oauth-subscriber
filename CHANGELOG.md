@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.8.1 - 2025-06-01
+
+* Fixed insufficient nonce entropy (CVE-2025-21617)
+
 ## 0.8.0 - 2025-06-01
 
 * Adjusted some method modifiers and added return types
