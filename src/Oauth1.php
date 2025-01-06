@@ -79,6 +79,9 @@ class Oauth1
      * Called when the middleware is handled.
      *
      * @return \Closure
+     *
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     public function __invoke(callable $handler)
     {
@@ -91,9 +94,13 @@ class Oauth1
         };
     }
 
-    private function onBefore(RequestInterface $request)
+    /**
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     */
+    private function onBefore(RequestInterface $request): RequestInterface
     {
-        $oauthparams = $this->getOauthParams(
+        $oauthparams = self::getOauthParams(
             $this->generateNonce($request),
             $this->config
         );
@@ -127,11 +134,9 @@ class Oauth1
      * @param RequestInterface $request Request to generate a signature for
      * @param array            $params  Oauth parameters.
      *
-     * @return string
-     *
      * @throws \RuntimeException
      */
-    public function getSignature(RequestInterface $request, array $params)
+    public function getSignature(RequestInterface $request, array $params): string
     {
         // Remove oauth_signature if present
         // Ref: Spec: 9.1.1 ("The oauth_signature parameter MUST be excluded.")
@@ -149,7 +154,7 @@ class Oauth1
 
         $baseString = $this->createBaseString(
             $request,
-            $this->prepareParameters($params)
+            self::prepareParameters($params)
         );
 
         // Implements double-dispatch to sign requests
@@ -181,10 +186,8 @@ class Oauth1
      * timestamp to use separate nonce's.
      *
      * @param RequestInterface $request Request to generate a nonce for
-     *
-     * @return string
      */
-    public function generateNonce(RequestInterface $request)
+    private static function generateNonce(RequestInterface $request): string
     {
         return sha1(uniqid('', true).$request->getUri()->getHost().$request->getUri()->getPath());
     }
@@ -199,29 +202,20 @@ class Oauth1
      * @param RequestInterface $request Request being signed
      * @param array            $params  Associative array of OAuth parameters
      *
-     * @return string Returns the base string
-     *
      * @see https://oauth.net/core/1.0/#sig_base_example
      */
-    protected function createBaseString(RequestInterface $request, array $params)
+    protected function createBaseString(RequestInterface $request, array $params): string
     {
         // Remove query params from URL. Ref: Spec: 9.1.2.
-        $url = $request->getUri()->withQuery('');
-        $query = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
-
         return strtoupper($request->getMethod())
-            .'&'.rawurlencode((string) $url)
-            .'&'.rawurlencode($query);
+            .'&'.rawurlencode((string) $request->getUri()->withQuery(''))
+            .'&'.rawurlencode(Query::build($params));
     }
 
     /**
-     * Convert booleans to strings, removed unset parameters, and sorts the array
-     *
-     * @param array $data Data array
-     *
-     * @return array
+     * @param array $data The data array
      */
-    private function prepareParameters(array $data)
+    private static function prepareParameters(array $data): array
     {
         // Parameters are sorted by name, using lexicographical byte value
         // ordering. Ref: Spec: 9.1.1 (1).
@@ -238,10 +232,8 @@ class Oauth1
 
     /**
      * @param string $algo Name of selected hashing algorithm (i.e. "md5", "sha256", "haval160,4", etc..)
-     *
-     * @return string
      */
-    private function signUsingHmac(string $algo, string $baseString)
+    private function signUsingHmac(string $algo, string $baseString): string
     {
         $key = rawurlencode($this->config['consumer_secret']).'&';
         if (isset($this->config['token_secret'])) {
@@ -252,13 +244,12 @@ class Oauth1
     }
 
     /**
-     * @return string
+     * @throws RuntimeException
      */
-    private function signUsingRsaSha1(string $baseString)
+    private function signUsingRsaSha1(string $baseString): string
     {
         if (!function_exists('openssl_pkey_get_private')) {
-            throw new \RuntimeException('RSA-SHA1 signature method '
-                .'requires the OpenSSL extension.');
+            throw new \RuntimeException('RSA-SHA1 signature method requires the OpenSSL extension.');
         }
 
         $privateKey = openssl_pkey_get_private(
@@ -285,10 +276,8 @@ class Oauth1
      * Builds the Authorization header for a request
      *
      * @param array $params Associative array of authorization parameters.
-     *
-     * @return array
      */
-    private function buildAuthorizationHeader(array $params)
+    private function buildAuthorizationHeader(array $params): array
     {
         foreach ($params as $key => $value) {
             $params[$key] = $key.'="'.rawurlencode((string) $value).'"';
@@ -309,10 +298,8 @@ class Oauth1
      *
      * @param string $nonce  Unique nonce
      * @param array  $config Configuration options of the plugin.
-     *
-     * @return array
      */
-    private function getOauthParams(string $nonce, array $config)
+    private static function getOauthParams(string $nonce, array $config): array
     {
         $params = [
             'oauth_consumer_key' => $config['consumer_key'],

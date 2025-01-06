@@ -13,7 +13,7 @@ This project can be installed using Composer. Add the following to your
 ```json
 {
     "require": {
-        "guzzlehttp/oauth-subscriber": "^0.7"
+        "guzzlehttp/oauth-subscriber": "^0.8"
     }
 }
 ```
