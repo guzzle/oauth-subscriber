@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.7.0 - UPCOMING
+## 0.7.0 - 2025-06-01
 
 * Dropped support for HHVM and PHP <7.2.5
 * Added support for PHP 8.1, 8.2, 8.3, 8.4
