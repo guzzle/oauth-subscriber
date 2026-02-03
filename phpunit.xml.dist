@@ -1,21 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="./vendor/autoload.php"
-         colors="true">
-    <php>
-        <!-- Specify your twitter OAuth credentials -->
-        <server name="OAUTH_CONSUMER_KEY" value="" />
-        <server name="OAUTH_CONSUMER_SECRET" value="" />
-        <server name="OAUTH_TOKEN" value="" />
-        <server name="OAUTH_TOKEN_SECRET" value="" />
-    </php>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         verbose="true"
+         failOnWarning="true"
+         failOnRisky="true"
+>
     <testsuites>
-        <testsuite>
-            <directory>tests</directory>
+        <testsuite name="AllTests">
+            <directory>tests/</directory>
         </testsuite>
     </testsuites>
-    <filter>
-        <whitelist>
-            <directory suffix=".php">src</directory>
-        </whitelist>
-    </filter>
 </phpunit>

@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace GuzzleHttp\Tests\Oauth1;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Query;
@@ -14,17 +15,17 @@ use PHPUnit\Framework\TestCase;
 
 class Oauth1Test extends TestCase
 {
-    const TIMESTAMP = '1327274290';
-    const NONCE = 'e7aa11195ca58349bec8b5ebe351d3497eb9e603';
+    public const TIMESTAMP = '1327274290';
+    public const NONCE = 'e7aa11195ca58349bec8b5ebe351d3497eb9e603';
 
     private $config = [
-        'consumer_key'    => 'foo',
+        'consumer_key' => 'foo',
         'consumer_secret' => 'bar',
-        'token'           => 'count',
-        'token_secret'    => 'dracula'
+        'token' => 'count',
+        'token_secret' => 'dracula',
     ];
 
-    public function testAcceptsConfigurationData()
+    public function testAcceptsConfigurationData(): void
     {
         $p = new Oauth1($this->config);
 
@@ -43,7 +44,7 @@ class Oauth1Test extends TestCase
         $this->assertEquals('header', $config['request_method']);
     }
 
-    public function testCreatesStringToSignFromPostRequest()
+    public function testCreatesStringToSignFromPostRequest(): void
     {
         $stack = HandlerStack::create();
 
@@ -55,17 +56,17 @@ class Oauth1Test extends TestCase
         $stack->push($history);
 
         $client = new Client([
-            'handler' => $stack
+            'handler' => $stack,
         ]);
 
-        $client->post('http://httpbin.org/post', [
+        $client->post('https://httpbin.org/post', [
             'auth' => 'oauth',
             'form_params' => [
                 'foo' => [
-                    'baz'  => ['bar'],
-                    'bam'  => [null, true, false]
-                ]
-            ]
+                    'baz' => ['bar'],
+                    'bam' => [null, true, false],
+                ],
+            ],
         ]);
 
         /* @var Request $request */
@@ -74,7 +75,7 @@ class Oauth1Test extends TestCase
         $this->assertTrue($request->hasHeader('Authorization'));
     }
 
-    public function testSignsPlainText()
+    public function testSignsPlainText(): void
     {
         $config = $this->config;
         $config['signature_method'] = Oauth1::SIGNATURE_METHOD_PLAINTEXT;
@@ -89,10 +90,10 @@ class Oauth1Test extends TestCase
         $stack->push($history);
 
         $client = new Client([
-            'handler' => $stack
+            'handler' => $stack,
         ]);
 
-        $client->get('http://httpbin.org', ['auth' => 'oauth']);
+        $client->get('https://httpbin.org', ['auth' => 'oauth']);
 
         /* @var Request $request */
         $request = $container[0]['request'];
@@ -102,7 +103,7 @@ class Oauth1Test extends TestCase
         $this->assertThat($request->getHeader('Authorization')[0], Assert::stringContains('oauth_signature="', false), '');
     }
 
-    public function testSignsOauthRequestsInHeader()
+    public function testSignsOauthRequestsInHeader(): void
     {
         $stack = HandlerStack::create();
 
@@ -114,10 +115,10 @@ class Oauth1Test extends TestCase
         $stack->push($history);
 
         $client = new Client([
-            'handler' => $stack
+            'handler' => $stack,
         ]);
 
-        $client->post('http://httpbin.org/post', [
+        $client->post('https://httpbin.org/post', [
             'auth' => 'oauth',
         ]);
 
@@ -130,11 +131,11 @@ class Oauth1Test extends TestCase
             'oauth_signature_method', 'oauth_timestamp', 'oauth_token',
             'oauth_version'];
         foreach ($check as $name) {
-            $this->assertThat($request->getHeader('Authorization')[0], Assert::stringContains($name . '=', false), '');
+            $this->assertThat($request->getHeader('Authorization')[0], Assert::stringContains($name.'=', false), '');
         }
     }
 
-    public function testSignsOauthQueryStringRequest()
+    public function testSignsOauthQueryStringRequest(): void
     {
         $config = $this->config;
         $config['request_method'] = Oauth1::REQUEST_METHOD_QUERY;
@@ -149,10 +150,10 @@ class Oauth1Test extends TestCase
         $stack->push($history);
 
         $client = new Client([
-            'handler' => $stack
+            'handler' => $stack,
         ]);
 
-        $client->get('http://httpbin.org', ['auth' => 'oauth']);
+        $client->get('https://httpbin.org', ['auth' => 'oauth']);
 
         /* @var Request $request */
         $request = $container[0]['request'];
@@ -171,7 +172,7 @@ class Oauth1Test extends TestCase
         $this->assertSame($keys, $check);
     }
 
-    public function testOnlyTouchesWhenAuthConfigIsOauth()
+    public function testOnlyTouchesWhenAuthConfigIsOauth(): void
     {
         $stack = HandlerStack::create();
 
@@ -183,10 +184,10 @@ class Oauth1Test extends TestCase
         $stack->push($history);
 
         $client = new Client([
-            'handler' => $stack
+            'handler' => $stack,
         ]);
 
-        $client->get('http://httpbin.org');
+        $client->get('https://httpbin.org');
 
         /* @var Request $request */
         $request = $container[0]['request'];
@@ -195,11 +196,10 @@ class Oauth1Test extends TestCase
         $this->assertEmpty($request->getHeader('Authorization'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testValidatesRequestMethod()
+    public function testValidatesRequestMethod(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         if (method_exists($this, 'expectException')) {
             $this->expectException(\InvalidArgumentException::class);
         }
@@ -213,17 +213,16 @@ class Oauth1Test extends TestCase
         $stack->push($middleware);
 
         $client = new Client([
-            'handler' => $stack
+            'handler' => $stack,
         ]);
 
-        $client->get('http://httpbin.org', ['auth' => 'oauth']);
+        $client->get('https://httpbin.org', ['auth' => 'oauth']);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testExceptionOnSignatureError()
+    public function testExceptionOnSignatureError(): void
     {
+        $this->expectException(\RuntimeException::class);
+
         if (method_exists($this, 'expectException')) {
             $this->expectException(\RuntimeException::class);
         }
@@ -237,13 +236,13 @@ class Oauth1Test extends TestCase
         $stack->push($middleware);
 
         $client = new Client([
-            'handler' => $stack
+            'handler' => $stack,
         ]);
 
-        $client->get('http://httpbin.org', ['auth' => 'oauth']);
+        $client->get('https://httpbin.org', ['auth' => 'oauth']);
     }
 
-    public function testDoesNotAddEmptyValuesToAuthorization()
+    public function testDoesNotAddEmptyValuesToAuthorization(): void
     {
         $config = $this->config;
         unset($config['token']);
@@ -258,10 +257,10 @@ class Oauth1Test extends TestCase
         $stack->push($history);
 
         $client = new Client([
-            'handler' => $stack
+            'handler' => $stack,
         ]);
 
-        $client->get('http://httpbin.org', ['auth' => 'oauth']);
+        $client->get('https://httpbin.org', ['auth' => 'oauth']);
 
         /* @var Request $request */
         $request = $container[0]['request'];
@@ -270,7 +269,7 @@ class Oauth1Test extends TestCase
         $this->assertThat($request->getHeader('Authorization')[0], Assert::logicalNot(Assert::stringContains('oauth_token=', false)), '');
     }
 
-    public function testRandomParametersAreNotAutomaticallyAdded()
+    public function testRandomParametersAreNotAutomaticallyAdded(): void
     {
         $config = $this->config;
         $config['foo'] = 'bar';
@@ -285,10 +284,10 @@ class Oauth1Test extends TestCase
         $stack->push($history);
 
         $client = new Client([
-            'handler' => $stack
+            'handler' => $stack,
         ]);
 
-        $client->get('http://httpbin.org', ['auth' => 'oauth']);
+        $client->get('https://httpbin.org', ['auth' => 'oauth']);
 
         /* @var Request $request */
         $request = $container[0]['request'];
@@ -297,7 +296,7 @@ class Oauth1Test extends TestCase
         $this->assertThat($request->getHeader('Authorization')[0], Assert::logicalNot(Assert::stringContains('foo=bar', false)), '');
     }
 
-    public function testAllowsRealm()
+    public function testAllowsRealm(): void
     {
         $config = $this->config;
         $config['realm'] = 'foo';
@@ -312,10 +311,10 @@ class Oauth1Test extends TestCase
         $stack->push($history);
 
         $client = new Client([
-            'handler' => $stack
+            'handler' => $stack,
         ]);
 
-        $client->get('http://httpbin.org', ['auth' => 'oauth']);
+        $client->get('https://httpbin.org', ['auth' => 'oauth']);
 
         /* @var Request $request */
         $request = $container[0]['request'];
@@ -324,89 +323,7 @@ class Oauth1Test extends TestCase
         $this->assertThat($request->getHeader('Authorization')[0], Assert::stringContains('OAuth realm="foo",', false), '');
     }
 
-    public function testTwitterIntegration()
-    {
-        if (empty(getenv('OAUTH_CONSUMER_SECRET'))) {
-            $this->markTestSkipped('No OAUTH_CONSUMER_SECRET provided in phpunit.xml');
-            return;
-        }
-
-        $config = $this->config;
-        $config['consumer_key']    = getenv('OAUTH_CONSUMER_KEY');
-        $config['consumer_secret'] = getenv('OAUTH_CONSUMER_SECRET');
-        $config['token']           = getenv('OAUTH_TOKEN');
-        $config['token_secret']    = getenv('OAUTH_TOKEN_SECRET');
-
-        $stack = HandlerStack::create();
-
-        $middleware = new Oauth1($config);
-        $stack->push($middleware);
-
-        $container = [];
-        $history = Middleware::history($container);
-        $stack->push($history);
-
-        $client = new Client([
-            'handler' => $stack
-        ]);
-
-        try {
-            $client->get('https://api.twitter.com/1.1/account/settings.json', ['auth' => 'oauth']);
-        } catch (ClientException $e) {
-            if ($e->getResponse()->getStatusCode() == 429) {
-                $this->markTestIncomplete('You are being throttled');
-            } else {
-                throw $e;
-            }
-        }
-    }
-
-    public function testTwitterStreamingIntegration()
-    {
-        if (empty(getenv('OAUTH_CONSUMER_SECRET'))) {
-            $this->markTestSkipped('No OAUTH_CONSUMER_SECRET provided in phpunit.xml');
-            return;
-        }
-
-        $config = $this->config;
-        $config['consumer_key']    = $_SERVER['OAUTH_CONSUMER_KEY'];
-        $config['consumer_secret'] = $_SERVER['OAUTH_CONSUMER_SECRET'];
-        $config['token']           = $_SERVER['OAUTH_TOKEN'];
-        $config['token_secret']    = $_SERVER['OAUTH_TOKEN_SECRET'];
-
-        $stack = HandlerStack::create();
-
-        $middleware = new Oauth1($config);
-        $stack->push($middleware);
-
-        $container = [];
-        $history = Middleware::history($container);
-        $stack->push($history);
-
-        $client = new Client([
-            'base_uri' => 'https://stream.twitter.com/1.1/',
-            'handler' => $stack,
-            'auth' => 'oauth'
-        ]);
-
-        try {
-            $response = $client->post('statuses/filter.json', [
-                'query'   => ['track' => 'bieber'],
-                'stream' => true
-            ]);
-            $body = $response->getBody()->getContents();
-            $this->assertThat(strtolower($body), Assert::stringContains('bieber', false), '');
-            $this->assertNotEmpty(json_decode($body, true));
-        } catch (ClientException $e) {
-            if ($e->getResponse()->getStatusCode() == 429) {
-                $this->markTestIncomplete('You are being throttled');
-            } else {
-                throw $e;
-            }
-        }
-    }
-
-    public function testSignsHmacSha256()
+    public function testSignsHmacSha256(): void
     {
         $config = $this->config;
         $config['signature_method'] = Oauth1::SIGNATURE_METHOD_HMACSHA256;
@@ -421,10 +338,10 @@ class Oauth1Test extends TestCase
         $stack->push($history);
 
         $client = new Client([
-            'handler' => $stack
+            'handler' => $stack,
         ]);
 
-        $client->get('http://httpbin.org', ['auth' => 'oauth']);
+        $client->get('https://httpbin.org', ['auth' => 'oauth']);
 
         /* @var Request $request */
         $request = $container[0]['request'];
