@@ -110,6 +110,48 @@ class Oauth1Test extends TestCase
         );
     }
 
+    public function testSignsBareFormBodyParametersAsEmptyValues(): void
+    {
+        $oauth = new Oauth1($this->config);
+        $params = [
+            'oauth_consumer_key' => 'foo',
+            'oauth_nonce' => self::NONCE,
+            'oauth_signature_method' => Oauth1::SIGNATURE_METHOD_HMAC,
+            'oauth_timestamp' => self::TIMESTAMP,
+            'oauth_token' => 'count',
+            'oauth_version' => '1.0',
+        ];
+
+        $request = new Request(
+            'POST',
+            'https://httpbin.org/post',
+            ['Content-Type' => 'application/x-www-form-urlencoded'],
+            'field'
+        );
+        $requestWithEmptyValue = new Request(
+            'POST',
+            'https://httpbin.org/post',
+            ['Content-Type' => 'application/x-www-form-urlencoded'],
+            'field='
+        );
+        $requestWithoutBody = new Request(
+            'POST',
+            'https://httpbin.org/post',
+            ['Content-Type' => 'application/x-www-form-urlencoded'],
+            ''
+        );
+        $signature = $oauth->getSignature($request, $params);
+
+        $this->assertSame(
+            $oauth->getSignature($requestWithEmptyValue, $params),
+            $signature
+        );
+        $this->assertNotSame(
+            $oauth->getSignature($requestWithoutBody, $params),
+            $signature
+        );
+    }
+
     public function testExcludesOauthSignatureFromQuerySignature(): void
     {
         $oauth = new Oauth1($this->config);
@@ -128,6 +170,53 @@ class Oauth1Test extends TestCase
         $this->assertSame(
             $oauth->getSignature($request, $params),
             $oauth->getSignature($requestWithSignature, $params)
+        );
+    }
+
+    public function testSignsBareQueryStringParametersAsEmptyValues(): void
+    {
+        $oauth = new Oauth1($this->config);
+        $params = [
+            'oauth_consumer_key' => 'foo',
+            'oauth_nonce' => self::NONCE,
+            'oauth_signature_method' => Oauth1::SIGNATURE_METHOD_HMAC,
+            'oauth_timestamp' => self::TIMESTAMP,
+            'oauth_token' => 'count',
+            'oauth_version' => '1.0',
+        ];
+
+        $request = new Request('GET', 'https://httpbin.org/get?querystring');
+        $requestWithEmptyValue = new Request('GET', 'https://httpbin.org/get?querystring=');
+        $requestWithoutQuery = new Request('GET', 'https://httpbin.org/get');
+
+        $this->assertSame(
+            $oauth->getSignature($requestWithEmptyValue, $params),
+            $oauth->getSignature($request, $params)
+        );
+        $this->assertNotSame(
+            $oauth->getSignature($requestWithoutQuery, $params),
+            $oauth->getSignature($request, $params)
+        );
+    }
+
+    public function testSignsDuplicateBareQueryStringParametersAsEmptyValues(): void
+    {
+        $oauth = new Oauth1($this->config);
+        $params = [
+            'oauth_consumer_key' => 'foo',
+            'oauth_nonce' => self::NONCE,
+            'oauth_signature_method' => Oauth1::SIGNATURE_METHOD_HMAC,
+            'oauth_timestamp' => self::TIMESTAMP,
+            'oauth_token' => 'count',
+            'oauth_version' => '1.0',
+        ];
+
+        $request = new Request('GET', 'https://httpbin.org/get?field&field=value');
+        $requestWithEmptyValue = new Request('GET', 'https://httpbin.org/get?field=&field=value');
+
+        $this->assertSame(
+            $oauth->getSignature($requestWithEmptyValue, $params),
+            $oauth->getSignature($request, $params)
         );
     }
 
