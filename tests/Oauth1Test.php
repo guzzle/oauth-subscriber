@@ -29,10 +29,14 @@ class Oauth1Test extends TestCase
     {
         $p = new Oauth1($this->config);
 
-        // Access the config object
         $class = new \ReflectionClass($p);
+
         $property = $class->getProperty('config');
-        $property->setAccessible(true);
+
+        if (PHP_VERSION_ID < 80100) {
+            $property->setAccessible(true);
+        }
+
         $config = $property->getValue($p);
 
         $this->assertEquals('foo', $config['consumer_key']);
