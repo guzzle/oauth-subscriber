@@ -3,6 +3,7 @@
 ## Unreleased
 
 * Added support for PHP 8.5
+* Added support for per-request `token` and `token_secret` overrides
 * Convert RSA signing failures to runtime exceptions
 * Fixed OAuth parameter normalization for duplicate parameter values
 * Sign bare query and form parameters as empty values
