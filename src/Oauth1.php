@@ -241,19 +241,28 @@ class Oauth1
             throw new \RuntimeException('RSA-SHA1 signature method requires a private_key_file option.');
         }
 
+        $keyContents = @file_get_contents($this->config['private_key_file']);
+        if ($keyContents === false) {
+            throw new \RuntimeException(sprintf(
+                'Unable to read RSA private key file: %s',
+                $this->config['private_key_file']
+            ));
+        }
+
         if (isset($this->config['private_key_passphrase'])) {
-            $privateKey = openssl_pkey_get_private(
-                file_get_contents($this->config['private_key_file']),
-                $this->config['private_key_passphrase']
-            );
+            $privateKey = @openssl_pkey_get_private($keyContents, $this->config['private_key_passphrase']);
         } else {
-            $privateKey = openssl_pkey_get_private(
-                file_get_contents($this->config['private_key_file'])
-            );
+            $privateKey = @openssl_pkey_get_private($keyContents);
+        }
+
+        if ($privateKey === false) {
+            throw new \RuntimeException('Unable to parse RSA private key.');
         }
 
         $signature = '';
-        openssl_sign($baseString, $signature, $privateKey);
+        if (!@openssl_sign($baseString, $signature, $privateKey, OPENSSL_ALGO_SHA1)) {
+            throw new \RuntimeException('Unable to sign using RSA-SHA1.');
+        }
         unset($privateKey);
 
         return $signature;

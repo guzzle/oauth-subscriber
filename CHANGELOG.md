@@ -3,6 +3,7 @@
 ## Unreleased
 
 * Added support for PHP 8.5
+* Convert RSA signing failures to runtime exceptions
 
 ## 0.8.2 - 2026-05-16
 
