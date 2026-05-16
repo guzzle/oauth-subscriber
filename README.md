@@ -3,7 +3,7 @@
 Signs HTTP requests using OAuth 1.0. Requests are signed using a
 consumer key, consumer secret, OAuth token, and OAuth secret.
 
-This version works with Guzzle 7.9+ and PHP 7.2.5+.
+This version works with Guzzle 7.10+ and PHP 7.2.5+.
 
 ## Installing
 

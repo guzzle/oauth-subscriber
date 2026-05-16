@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Unreleased
+
+* Added support for PHP 8.5
+
 ## 0.8.2 - 2026-05-16
 
 * Fixed signature generation when request body or query parameters include `oauth_signature`
