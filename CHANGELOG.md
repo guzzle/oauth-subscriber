@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Unreleased
+
+* Fixed signature generation when request body or query parameters include `oauth_signature`
+
 ## 0.8.1 - 2025-01-06
 
 * Fixed insufficient nonce entropy (CVE-2025-21617)

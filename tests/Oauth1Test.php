@@ -75,6 +75,58 @@ class Oauth1Test extends TestCase
         $this->assertTrue($request->hasHeader('Authorization'));
     }
 
+    public function testExcludesOauthSignatureFromFormBodySignature(): void
+    {
+        $oauth = new Oauth1($this->config);
+        $params = [
+            'oauth_consumer_key' => 'foo',
+            'oauth_nonce' => self::NONCE,
+            'oauth_signature_method' => Oauth1::SIGNATURE_METHOD_HMAC,
+            'oauth_timestamp' => self::TIMESTAMP,
+            'oauth_token' => 'count',
+            'oauth_version' => '1.0',
+        ];
+
+        $request = new Request(
+            'POST',
+            'https://httpbin.org/post',
+            ['Content-Type' => 'application/x-www-form-urlencoded'],
+            'foo=bar'
+        );
+        $requestWithSignature = new Request(
+            'POST',
+            'https://httpbin.org/post',
+            ['Content-Type' => 'application/x-www-form-urlencoded'],
+            'foo=bar&oauth_signature=bad'
+        );
+
+        $this->assertSame(
+            $oauth->getSignature($request, $params),
+            $oauth->getSignature($requestWithSignature, $params)
+        );
+    }
+
+    public function testExcludesOauthSignatureFromQuerySignature(): void
+    {
+        $oauth = new Oauth1($this->config);
+        $params = [
+            'oauth_consumer_key' => 'foo',
+            'oauth_nonce' => self::NONCE,
+            'oauth_signature_method' => Oauth1::SIGNATURE_METHOD_HMAC,
+            'oauth_timestamp' => self::TIMESTAMP,
+            'oauth_token' => 'count',
+            'oauth_version' => '1.0',
+        ];
+
+        $request = new Request('GET', 'https://httpbin.org/get?foo=bar');
+        $requestWithSignature = new Request('GET', 'https://httpbin.org/get?foo=bar&oauth_signature=bad');
+
+        $this->assertSame(
+            $oauth->getSignature($request, $params),
+            $oauth->getSignature($requestWithSignature, $params)
+        );
+    }
+
     public function testSignsPlainText(): void
     {
         $config = $this->config;

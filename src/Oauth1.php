@@ -135,10 +135,6 @@ class Oauth1
      */
     public function getSignature(RequestInterface $request, array $params): string
     {
-        // Remove oauth_signature if present
-        // Ref: Spec: 9.1.1 ("The oauth_signature parameter MUST be excluded.")
-        unset($params['oauth_signature']);
-
         // Add POST fields if the request uses POST fields and no files
         if ($request->getHeaderLine('Content-Type') === 'application/x-www-form-urlencoded') {
             $body = Query::parse($request->getBody()->getContents());
@@ -148,6 +144,10 @@ class Oauth1
         // Parse & add query string parameters as base string parameters
         $query = $request->getUri()->getQuery();
         $params += Query::parse($query);
+
+        // Remove oauth_signature if present
+        // Ref: Spec: 9.1.1 ("The oauth_signature parameter MUST be excluded.")
+        unset($params['oauth_signature']);
 
         $baseString = $this->createBaseString(
             $request,
