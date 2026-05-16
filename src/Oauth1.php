@@ -206,7 +206,16 @@ class Oauth1
 
         foreach ($data as $key => $value) {
             if ($value === null) {
-                unset($data[$key]);
+                $data[$key] = '';
+                continue;
+            }
+
+            if (is_array($value)) {
+                foreach ($value as $index => $nestedValue) {
+                    if ($nestedValue === null) {
+                        $data[$key][$index] = '';
+                    }
+                }
             }
         }
 
