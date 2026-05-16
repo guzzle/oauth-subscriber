@@ -294,6 +294,63 @@ class Oauth1Test extends TestCase
         $client->get('https://httpbin.org', ['auth' => 'oauth']);
     }
 
+    public function testExceptionOnMissingRsaPrivateKeyFileOption(): void
+    {
+        if (!function_exists('openssl_pkey_get_private')) {
+            $this->markTestSkipped('OpenSSL extension is not available.');
+        }
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('RSA-SHA1 signature method requires a private_key_file option.');
+
+        $config = $this->config;
+        $config['signature_method'] = Oauth1::SIGNATURE_METHOD_RSA;
+
+        $middleware = new Oauth1($config);
+
+        $middleware->getSignature(new Request('GET', 'https://httpbin.org'), []);
+    }
+
+    public function testSignsRsaSha1(): void
+    {
+        if (!function_exists('openssl_pkey_new')) {
+            $this->markTestSkipped('OpenSSL extension is not available.');
+        }
+
+        $privateKey = openssl_pkey_new([
+            'private_key_bits' => 2048,
+            'private_key_type' => OPENSSL_KEYTYPE_RSA,
+        ]);
+        if ($privateKey === false) {
+            $this->markTestSkipped('Unable to generate RSA private key.');
+        }
+
+        $privateKeyContents = '';
+        if (!openssl_pkey_export($privateKey, $privateKeyContents)) {
+            $this->markTestSkipped('Unable to export RSA private key.');
+        }
+
+        $privateKeyFile = tempnam(sys_get_temp_dir(), 'oauth1-key-');
+        $this->assertNotFalse($privateKeyFile);
+
+        $this->assertNotFalse(file_put_contents($privateKeyFile, $privateKeyContents));
+
+        try {
+            $config = $this->config;
+            $config['signature_method'] = Oauth1::SIGNATURE_METHOD_RSA;
+            $config['private_key_file'] = $privateKeyFile;
+
+            $middleware = new Oauth1($config);
+
+            $signature = $middleware->getSignature(new Request('GET', 'https://httpbin.org'), []);
+
+            $this->assertNotSame('', $signature);
+            $this->assertNotFalse(base64_decode($signature, true));
+        } finally {
+            @unlink($privateKeyFile);
+        }
+    }
+
     public function testDoesNotAddEmptyValuesToAuthorization(): void
     {
         $config = $this->config;

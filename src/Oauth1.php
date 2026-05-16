@@ -170,7 +170,6 @@ class Oauth1
                 break;
             default:
                 throw new \RuntimeException('Unknown signature method: '.$this->config['signature_method']);
-                break;
         }
 
         return base64_encode($signature);
@@ -228,7 +227,7 @@ class Oauth1
     }
 
     /**
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     private function signUsingRsaSha1(string $baseString): string
     {
@@ -236,10 +235,22 @@ class Oauth1
             throw new \RuntimeException('RSA-SHA1 signature method requires the OpenSSL extension.');
         }
 
-        $privateKey = openssl_pkey_get_private(
-            file_get_contents($this->config['private_key_file']),
-            $this->config['private_key_passphrase']
-        );
+        if (!isset($this->config['private_key_file'])
+            || !is_string($this->config['private_key_file'])
+            || $this->config['private_key_file'] === '') {
+            throw new \RuntimeException('RSA-SHA1 signature method requires a private_key_file option.');
+        }
+
+        if (isset($this->config['private_key_passphrase'])) {
+            $privateKey = openssl_pkey_get_private(
+                file_get_contents($this->config['private_key_file']),
+                $this->config['private_key_passphrase']
+            );
+        } else {
+            $privateKey = openssl_pkey_get_private(
+                file_get_contents($this->config['private_key_file'])
+            );
+        }
 
         $signature = '';
         openssl_sign($baseString, $signature, $privateKey);

@@ -3,6 +3,7 @@
 ## Unreleased
 
 * Fixed signature generation when request body or query parameters include `oauth_signature`
+* Validate RSA private key configuration before signing
 
 ## 0.8.1 - 2025-01-06
 
