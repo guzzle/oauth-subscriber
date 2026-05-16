@@ -149,7 +149,7 @@ class Oauth1
 
         switch ($config['request_method']) {
             case self::REQUEST_METHOD_HEADER:
-                list($header, $value) = $this->buildAuthorizationHeader($oauthparams, $config);
+                list($header, $value) = self::buildAuthorizationHeader($oauthparams, $config);
                 $request = $request->withHeader($header, $value);
                 break;
             case self::REQUEST_METHOD_QUERY:
@@ -213,16 +213,16 @@ class Oauth1
         // Implements double-dispatch to sign requests
         switch ($config['signature_method']) {
             case Oauth1::SIGNATURE_METHOD_HMAC:
-                $signature = $this->signUsingHmac('sha1', $baseString, $config);
+                $signature = self::signUsingHmac('sha1', $baseString, $config);
                 break;
             case Oauth1::SIGNATURE_METHOD_HMACSHA256:
-                $signature = $this->signUsingHmac('sha256', $baseString, $config);
+                $signature = self::signUsingHmac('sha256', $baseString, $config);
                 break;
             case Oauth1::SIGNATURE_METHOD_RSA:
-                $signature = $this->signUsingRsaSha1($baseString, $config);
+                $signature = self::signUsingRsaSha1($baseString, $config);
                 break;
             case Oauth1::SIGNATURE_METHOD_PLAINTEXT:
-                $signature = $this->signUsingPlaintext($baseString);
+                $signature = self::signUsingPlaintext($baseString);
                 break;
             default:
                 throw new \RuntimeException('Unknown signature method: '.$config['signature_method']);
@@ -305,7 +305,7 @@ class Oauth1
      * @param string $algo   Name of selected hashing algorithm (i.e. "md5", "sha256", "haval160,4", etc..)
      * @param array  $config Configuration settings for this request
      */
-    private function signUsingHmac(string $algo, string $baseString, array $config): string
+    private static function signUsingHmac(string $algo, string $baseString, array $config): string
     {
         $key = rawurlencode($config['consumer_secret']).'&';
         if (isset($config['token_secret'])) {
@@ -320,7 +320,7 @@ class Oauth1
      *
      * @throws \RuntimeException
      */
-    private function signUsingRsaSha1(string $baseString, array $config): string
+    private static function signUsingRsaSha1(string $baseString, array $config): string
     {
         if (!function_exists('openssl_pkey_get_private')) {
             throw new \RuntimeException('RSA-SHA1 signature method requires the OpenSSL extension.');
@@ -362,7 +362,7 @@ class Oauth1
     /**
      * @return string
      */
-    private function signUsingPlaintext(string $baseString)
+    private static function signUsingPlaintext(string $baseString)
     {
         return $baseString;
     }
@@ -373,7 +373,7 @@ class Oauth1
      * @param array $params Associative array of authorization parameters.
      * @param array $config Configuration settings for this request
      */
-    private function buildAuthorizationHeader(array $params, array $config): array
+    private static function buildAuthorizationHeader(array $params, array $config): array
     {
         foreach ($params as $key => $value) {
             $params[$key] = $key.'="'.rawurlencode((string) $value).'"';
