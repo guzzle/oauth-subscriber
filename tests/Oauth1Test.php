@@ -315,6 +315,51 @@ class Oauth1Test extends TestCase
         $middleware->getSignature(new Request('GET', 'https://httpbin.org'), []);
     }
 
+    public function testExceptionOnMissingRsaPrivateKeyFile(): void
+    {
+        if (!function_exists('openssl_pkey_get_private')) {
+            $this->markTestSkipped('OpenSSL extension is not available.');
+        }
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Unable to read RSA private key file');
+
+        $config = $this->config;
+        $config['signature_method'] = Oauth1::SIGNATURE_METHOD_RSA;
+        $config['private_key_file'] = __DIR__.'/missing-private-key.pem';
+
+        $middleware = new Oauth1($config);
+
+        $middleware->getSignature(new Request('GET', 'https://httpbin.org'), []);
+    }
+
+    public function testExceptionOnInvalidRsaPrivateKeyFile(): void
+    {
+        if (!function_exists('openssl_pkey_get_private')) {
+            $this->markTestSkipped('OpenSSL extension is not available.');
+        }
+
+        $privateKeyFile = tempnam(sys_get_temp_dir(), 'oauth1-key-');
+        $this->assertNotFalse($privateKeyFile);
+
+        $this->assertNotFalse(file_put_contents($privateKeyFile, 'not a private key'));
+
+        try {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage('Unable to parse RSA private key.');
+
+            $config = $this->config;
+            $config['signature_method'] = Oauth1::SIGNATURE_METHOD_RSA;
+            $config['private_key_file'] = $privateKeyFile;
+
+            $middleware = new Oauth1($config);
+
+            $middleware->getSignature(new Request('GET', 'https://httpbin.org'), []);
+        } finally {
+            @unlink($privateKeyFile);
+        }
+    }
+
     public function testSignsRsaSha1(): void
     {
         if (!function_exists('openssl_pkey_new')) {
