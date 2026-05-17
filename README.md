@@ -76,6 +76,30 @@ $client = new Client([
 $res = $client->get('statuses/home_timeline.json');
 ```
 
+You can override the `token` and `token_secret` values for an individual
+request using the `oauth` request option. The `auth` request option must
+still be set to `oauth` to enable signing for the request.
+
+```php
+$res = $client->get('statuses/home_timeline.json', [
+    'auth' => 'oauth',
+    'oauth' => [
+        'token'        => 'request_token',
+        'token_secret' => 'request_token_secret',
+    ],
+]);
+```
+
+Only `token` and `token_secret` are supported in the `oauth` request
+option. Pass both values when switching to a different credential pair.
+Do not pass OAuth credentials using Guzzle's array-based `auth` option,
+which is reserved for Guzzle's built-in HTTP authentication handlers. If
+you use custom retry middleware to refresh credentials, make sure retries
+re-enter this middleware so each retry is signed with fresh OAuth
+parameters. Custom middleware that runs before this middleware can still
+see the `oauth` request option, so avoid logging request options that
+contain secrets.
+
 You can set the `token` and `token_secret` options to an empty string to
 use two-legged OAuth.
 

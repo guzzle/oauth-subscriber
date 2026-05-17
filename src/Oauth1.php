@@ -86,8 +86,11 @@ class Oauth1
     public function __invoke(callable $handler)
     {
         return function ($request, array $options) use ($handler) {
-            if (isset($options['auth']) && $options['auth'] == 'oauth') {
-                $request = $this->onBefore($request);
+            if (($options['auth'] ?? null) === 'oauth') {
+                $config = self::getEffectiveConfig($this->config, $options);
+                unset($options['oauth']);
+
+                $request = self::onBefore($request, $config);
             }
 
             return $handler($request, $options);
@@ -95,19 +98,57 @@ class Oauth1
     }
 
     /**
+     * Returns the configuration to use for a single request.
+     *
+     * Only token credential overrides are supported in request options.
+     *
+     * @param array $config  Base configuration settings
+     * @param array $options Request options
+     *
+     * @throws \InvalidArgumentException
+     */
+    private static function getEffectiveConfig(array $config, array $options): array
+    {
+        if (!array_key_exists('oauth', $options) || $options['oauth'] === null) {
+            return $config;
+        }
+
+        if (!is_array($options['oauth'])) {
+            throw new \InvalidArgumentException('The oauth request option must be an array.');
+        }
+
+        foreach (['token', 'token_secret'] as $key) {
+            if (!array_key_exists($key, $options['oauth'])) {
+                continue;
+            }
+
+            if ($options['oauth'][$key] === null) {
+                unset($config[$key]);
+                continue;
+            }
+
+            $config[$key] = $options['oauth'][$key];
+        }
+
+        return $config;
+    }
+
+    /**
+     * @param array $config Configuration settings for this request
+     *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    private function onBefore(RequestInterface $request): RequestInterface
+    private static function onBefore(RequestInterface $request, array $config): RequestInterface
     {
-        $oauthparams = self::getOauthParams($this->config);
+        $oauthparams = self::getOauthParams($config);
 
-        $oauthparams['oauth_signature'] = $this->getSignature($request, $oauthparams);
+        $oauthparams['oauth_signature'] = self::getSignatureWithConfig($request, $oauthparams, $config);
         uksort($oauthparams, 'strcmp');
 
-        switch ($this->config['request_method']) {
+        switch ($config['request_method']) {
             case self::REQUEST_METHOD_HEADER:
-                list($header, $value) = $this->buildAuthorizationHeader($oauthparams);
+                list($header, $value) = self::buildAuthorizationHeader($oauthparams, $config);
                 $request = $request->withHeader($header, $value);
                 break;
             case self::REQUEST_METHOD_QUERY:
@@ -118,7 +159,7 @@ class Oauth1
             default:
                 throw new \InvalidArgumentException(sprintf(
                     'Invalid consumer method "%s"',
-                    $this->config['request_method']
+                    $config['request_method']
                 ));
         }
 
@@ -135,6 +176,20 @@ class Oauth1
      */
     public function getSignature(RequestInterface $request, array $params): string
     {
+        return self::getSignatureWithConfig($request, $params, $this->config);
+    }
+
+    /**
+     * Calculate signature for request using the given configuration.
+     *
+     * @param RequestInterface $request Request to generate a signature for
+     * @param array            $params  Oauth parameters
+     * @param array            $config  Configuration settings for this request
+     *
+     * @throws \RuntimeException
+     */
+    private static function getSignatureWithConfig(RequestInterface $request, array $params, array $config): string
+    {
         // Add POST fields if the request uses POST fields and no files
         if ($request->getHeaderLine('Content-Type') === 'application/x-www-form-urlencoded') {
             $body = Query::parse($request->getBody()->getContents());
@@ -149,27 +204,27 @@ class Oauth1
         // Ref: Spec: 9.1.1 ("The oauth_signature parameter MUST be excluded.")
         unset($params['oauth_signature']);
 
-        $baseString = $this->createBaseString(
+        $baseString = self::createBaseString(
             $request,
             self::prepareParameters($params)
         );
 
         // Implements double-dispatch to sign requests
-        switch ($this->config['signature_method']) {
+        switch ($config['signature_method']) {
             case Oauth1::SIGNATURE_METHOD_HMAC:
-                $signature = $this->signUsingHmac('sha1', $baseString);
+                $signature = self::signUsingHmac('sha1', $baseString, $config);
                 break;
             case Oauth1::SIGNATURE_METHOD_HMACSHA256:
-                $signature = $this->signUsingHmac('sha256', $baseString);
+                $signature = self::signUsingHmac('sha256', $baseString, $config);
                 break;
             case Oauth1::SIGNATURE_METHOD_RSA:
-                $signature = $this->signUsingRsaSha1($baseString);
+                $signature = self::signUsingRsaSha1($baseString, $config);
                 break;
             case Oauth1::SIGNATURE_METHOD_PLAINTEXT:
-                $signature = $this->signUsingPlaintext($baseString);
+                $signature = self::signUsingPlaintext($baseString);
                 break;
             default:
-                throw new \RuntimeException('Unknown signature method: '.$this->config['signature_method']);
+                throw new \RuntimeException('Unknown signature method: '.$config['signature_method']);
         }
 
         return base64_encode($signature);
@@ -187,7 +242,7 @@ class Oauth1
      *
      * @see https://oauth.net/core/1.0/#sig_base_example
      */
-    protected function createBaseString(RequestInterface $request, array $params): string
+    private static function createBaseString(RequestInterface $request, array $params): string
     {
         // Remove query params from URL. Ref: Spec: 9.1.2.
         return strtoupper($request->getMethod())
@@ -246,43 +301,46 @@ class Oauth1
     }
 
     /**
-     * @param string $algo Name of selected hashing algorithm (i.e. "md5", "sha256", "haval160,4", etc..)
+     * @param string $algo   Name of selected hashing algorithm (i.e. "md5", "sha256", "haval160,4", etc..)
+     * @param array  $config Configuration settings for this request
      */
-    private function signUsingHmac(string $algo, string $baseString): string
+    private static function signUsingHmac(string $algo, string $baseString, array $config): string
     {
-        $key = rawurlencode($this->config['consumer_secret']).'&';
-        if (isset($this->config['token_secret'])) {
-            $key .= rawurlencode($this->config['token_secret']);
+        $key = rawurlencode($config['consumer_secret']).'&';
+        if (isset($config['token_secret'])) {
+            $key .= rawurlencode($config['token_secret']);
         }
 
         return hash_hmac($algo, $baseString, $key, true);
     }
 
     /**
+     * @param array $config Configuration settings for this request
+     *
      * @throws \RuntimeException
      */
-    private function signUsingRsaSha1(string $baseString): string
+    private static function signUsingRsaSha1(string $baseString, array $config): string
     {
         if (!function_exists('openssl_pkey_get_private')) {
             throw new \RuntimeException('RSA-SHA1 signature method requires the OpenSSL extension.');
         }
 
-        if (!isset($this->config['private_key_file'])
-            || !is_string($this->config['private_key_file'])
-            || $this->config['private_key_file'] === '') {
+        if (!isset($config['private_key_file'])
+            || !is_string($config['private_key_file'])
+            || $config['private_key_file'] === '') {
             throw new \RuntimeException('RSA-SHA1 signature method requires a private_key_file option.');
         }
 
-        $keyContents = @file_get_contents($this->config['private_key_file']);
+        $keyContents = @file_get_contents($config['private_key_file']);
         if ($keyContents === false) {
             throw new \RuntimeException(sprintf(
                 'Unable to read RSA private key file: %s',
-                $this->config['private_key_file']
+                $config['private_key_file']
             ));
         }
 
-        if (isset($this->config['private_key_passphrase'])) {
-            $privateKey = @openssl_pkey_get_private($keyContents, $this->config['private_key_passphrase']);
+        if (isset($config['private_key_passphrase'])) {
+            $privateKey = @openssl_pkey_get_private($keyContents, $config['private_key_passphrase']);
         } else {
             $privateKey = @openssl_pkey_get_private($keyContents);
         }
@@ -303,7 +361,7 @@ class Oauth1
     /**
      * @return string
      */
-    private function signUsingPlaintext(string $baseString)
+    private static function signUsingPlaintext(string $baseString)
     {
         return $baseString;
     }
@@ -312,17 +370,18 @@ class Oauth1
      * Builds the Authorization header for a request
      *
      * @param array $params Associative array of authorization parameters.
+     * @param array $config Configuration settings for this request
      */
-    private function buildAuthorizationHeader(array $params): array
+    private static function buildAuthorizationHeader(array $params, array $config): array
     {
         foreach ($params as $key => $value) {
             $params[$key] = $key.'="'.rawurlencode((string) $value).'"';
         }
 
-        if (isset($this->config['realm'])) {
+        if (isset($config['realm'])) {
             array_unshift(
                 $params,
-                'realm="'.rawurlencode($this->config['realm']).'"'
+                'realm="'.rawurlencode($config['realm']).'"'
             );
         }
 

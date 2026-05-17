@@ -7,11 +7,14 @@ namespace GuzzleHttp\Tests\Oauth1;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
+use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Psr7\Query;
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Subscriber\Oauth\Oauth1;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\RequestInterface;
 
 class Oauth1Test extends TestCase
 {
@@ -411,6 +414,308 @@ class Oauth1Test extends TestCase
         $this->assertEmpty($request->getHeader('Authorization'));
     }
 
+    public function testOnlyTouchesWhenAuthConfigIsExactlyOauth(): void
+    {
+        $container = [];
+        $client = $this->createClientWithHistory(new Oauth1($this->config), $container);
+
+        $client->get('https://example.com', ['auth' => true]);
+
+        $request = $container[0]['request'];
+
+        $this->assertFalse($request->hasHeader('Authorization'));
+        $this->assertCount(0, Query::parse($request->getUri()->getQuery()));
+    }
+
+    public function testAllowsTokenCredentialsToBeOverriddenPerRequest(): void
+    {
+        $container = [];
+        $client = $this->createClientWithHistory(new Oauth1($this->config), $container);
+
+        $client->get('https://example.com', [
+            'auth' => 'oauth',
+            'oauth' => [
+                'token' => 'override-token',
+                'token_secret' => 'override-secret',
+            ],
+        ]);
+
+        $request = $container[0]['request'];
+        $params = $this->parseAuthorizationHeader($request);
+        $header = $request->getHeaderLine('Authorization');
+
+        $this->assertSame('override-token', $params['oauth_token']);
+        $this->assertThat($header, Assert::logicalNot(Assert::stringContains('override-secret', false)), '');
+        $this->assertThat($header, Assert::logicalNot(Assert::stringContains('token_secret', false)), '');
+    }
+
+    public function testPerRequestTokenSecretChangesSignature(): void
+    {
+        $container = [];
+        $client = $this->createClientWithHistory(new Oauth1($this->config), $container);
+
+        $client->get('https://example.com', [
+            'auth' => 'oauth',
+            'oauth' => [
+                'token' => 'override-token',
+                'token_secret' => 'override-secret',
+            ],
+        ]);
+
+        $request = $container[0]['request'];
+        $params = $this->parseAuthorizationHeader($request);
+        $actualSignature = $params['oauth_signature'];
+        unset($params['oauth_signature']);
+
+        $effectiveConfig = $this->config;
+        $effectiveConfig['token'] = 'override-token';
+        $effectiveConfig['token_secret'] = 'override-secret';
+
+        $constructorSignature = (new Oauth1($this->config))->getSignature(
+            $request->withoutHeader('Authorization'),
+            $params
+        );
+        $effectiveSignature = (new Oauth1($effectiveConfig))->getSignature(
+            $request->withoutHeader('Authorization'),
+            $params
+        );
+
+        $this->assertSame($effectiveSignature, $actualSignature);
+        $this->assertNotSame($constructorSignature, $actualSignature);
+    }
+
+    public function testPerRequestTokenOverridesDoNotMutateMiddlewareConfiguration(): void
+    {
+        $container = [];
+        $client = $this->createClientWithHistory(new Oauth1($this->config), $container);
+
+        $client->get('https://example.com/one', [
+            'auth' => 'oauth',
+            'oauth' => [
+                'token' => 'override-token',
+                'token_secret' => 'override-secret',
+            ],
+        ]);
+        $client->get('https://example.com/two', ['auth' => 'oauth']);
+
+        $firstParams = $this->parseAuthorizationHeader($container[0]['request']);
+        $secondParams = $this->parseAuthorizationHeader($container[1]['request']);
+
+        $this->assertSame('override-token', $firstParams['oauth_token']);
+        $this->assertSame('count', $secondParams['oauth_token']);
+    }
+
+    public function testUsesDefaultOauthRequestOptionFromClientConfiguration(): void
+    {
+        $container = [];
+        $client = $this->createClientWithHistory(new Oauth1($this->config), $container, [
+            'auth' => 'oauth',
+            'oauth' => [
+                'token' => 'default-override-token',
+                'token_secret' => 'default-override-secret',
+            ],
+        ]);
+
+        $client->get('https://example.com');
+
+        $params = $this->parseAuthorizationHeader($container[0]['request']);
+
+        $this->assertSame('default-override-token', $params['oauth_token']);
+    }
+
+    public function testRequestOauthOptionReplacesDefaultOauthRequestOption(): void
+    {
+        $container = [];
+        $client = $this->createClientWithHistory(new Oauth1($this->config), $container, [
+            'auth' => 'oauth',
+            'oauth' => [
+                'token' => 'default-override-token',
+                'token_secret' => 'default-override-secret',
+            ],
+        ]);
+
+        $client->get('https://example.com', [
+            'oauth' => [
+                'token' => 'request-override-token',
+                'token_secret' => 'request-override-secret',
+            ],
+        ]);
+
+        $params = $this->parseAuthorizationHeader($container[0]['request']);
+
+        $this->assertSame('request-override-token', $params['oauth_token']);
+    }
+
+    public function testNullOauthRequestOptionRemovesDefaultOauthRequestOption(): void
+    {
+        $container = [];
+        $client = $this->createClientWithHistory(new Oauth1($this->config), $container, [
+            'auth' => 'oauth',
+            'oauth' => [
+                'token' => 'default-override-token',
+                'token_secret' => 'default-override-secret',
+            ],
+        ]);
+
+        $client->get('https://example.com', ['oauth' => null]);
+
+        $params = $this->parseAuthorizationHeader($container[0]['request']);
+
+        $this->assertSame('count', $params['oauth_token']);
+    }
+
+    public function testOauthRequestOptionDoesNotSignWithoutOauthAuth(): void
+    {
+        $container = [];
+        $client = $this->createClientWithHistory(new Oauth1($this->config), $container);
+
+        $client->get('https://example.com', [
+            'oauth' => [
+                'token' => 'override-token',
+                'token_secret' => 'override-secret',
+            ],
+        ]);
+
+        $request = $container[0]['request'];
+
+        $this->assertFalse($request->hasHeader('Authorization'));
+        $this->assertCount(0, Query::parse($request->getUri()->getQuery()));
+    }
+
+    public function testAuthNullDisablesDefaultOauthAuth(): void
+    {
+        $container = [];
+        $client = $this->createClientWithHistory(new Oauth1($this->config), $container, ['auth' => 'oauth']);
+
+        $client->get('https://example.com', [
+            'auth' => null,
+            'oauth' => [
+                'token' => 'override-token',
+                'token_secret' => 'override-secret',
+            ],
+        ]);
+
+        $request = $container[0]['request'];
+
+        $this->assertFalse($request->hasHeader('Authorization'));
+        $this->assertCount(0, Query::parse($request->getUri()->getQuery()));
+    }
+
+    public function testRejectsNonArrayOauthRequestOption(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The oauth request option must be an array.');
+
+        $container = [];
+        $client = $this->createClientWithHistory(new Oauth1($this->config), $container);
+
+        $client->get('https://example.com', [
+            'auth' => 'oauth',
+            'oauth' => 'override-token',
+        ]);
+    }
+
+    public function testIgnoresUnknownOauthRequestOptions(): void
+    {
+        $container = [];
+        $client = $this->createClientWithHistory(new Oauth1($this->config), $container);
+
+        $client->get('https://example.com', [
+            'auth' => 'oauth',
+            'oauth' => [
+                'token' => 'override-token',
+                'token_secret' => 'override-secret',
+                'foo' => 'bar',
+            ],
+        ]);
+
+        $header = $container[0]['request']->getHeaderLine('Authorization');
+        $params = $this->parseAuthorizationHeader($container[0]['request']);
+
+        $this->assertSame('override-token', $params['oauth_token']);
+        $this->assertThat($header, Assert::logicalNot(Assert::stringContains('foo=', false)), '');
+    }
+
+    public function testNullPerRequestTokenRemovesConfiguredToken(): void
+    {
+        $container = [];
+        $client = $this->createClientWithHistory(new Oauth1($this->config), $container);
+
+        $client->get('https://example.com', [
+            'auth' => 'oauth',
+            'oauth' => [
+                'token' => null,
+                'token_secret' => null,
+            ],
+        ]);
+
+        $header = $container[0]['request']->getHeaderLine('Authorization');
+
+        $this->assertThat($header, Assert::logicalNot(Assert::stringContains('oauth_token=', false)), '');
+        $this->assertThat($header, Assert::stringContains('oauth_signature=', false), '');
+    }
+
+    public function testEmptyPerRequestTokenIsSentAsEmptyString(): void
+    {
+        $container = [];
+        $client = $this->createClientWithHistory(new Oauth1($this->config), $container);
+
+        $client->get('https://example.com', [
+            'auth' => 'oauth',
+            'oauth' => [
+                'token' => '',
+                'token_secret' => '',
+            ],
+        ]);
+
+        $params = $this->parseAuthorizationHeader($container[0]['request']);
+
+        $this->assertSame('', $params['oauth_token']);
+        $this->assertArrayHasKey('oauth_signature', $params);
+    }
+
+    public function testUsesPerRequestTokenInQueryString(): void
+    {
+        $config = $this->config;
+        $config['request_method'] = Oauth1::REQUEST_METHOD_QUERY;
+
+        $container = [];
+        $client = $this->createClientWithHistory(new Oauth1($config), $container);
+
+        $client->get('https://example.com', [
+            'auth' => 'oauth',
+            'oauth' => [
+                'token' => 'override-token',
+                'token_secret' => 'override-secret',
+            ],
+        ]);
+
+        $request = $container[0]['request'];
+        $query = Query::parse($request->getUri()->getQuery());
+
+        $this->assertFalse($request->hasHeader('Authorization'));
+        $this->assertSame('override-token', $query['oauth_token']);
+        $this->assertArrayHasKey('oauth_signature', $query);
+        $this->assertArrayNotHasKey('token_secret', $query);
+        $this->assertArrayNotHasKey('oauth_token_secret', $query);
+    }
+
+    public function testRemovesOauthRequestOptionBeforePassingToHandler(): void
+    {
+        $container = [];
+        $client = $this->createClientWithHistory(new Oauth1($this->config), $container);
+
+        $client->get('https://example.com', [
+            'auth' => 'oauth',
+            'oauth' => [
+                'token' => 'override-token',
+                'token_secret' => 'override-secret',
+            ],
+        ]);
+
+        $this->assertArrayNotHasKey('oauth', $container[0]['options']);
+    }
+
     public function testValidatesRequestMethod(): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -666,5 +971,39 @@ class Oauth1Test extends TestCase
         $this->assertTrue($request->hasHeader('Authorization'));
         $this->assertThat($request->getHeader('Authorization')[0], Assert::stringContains('oauth_signature_method="HMAC-SHA256"', false), '');
         $this->assertThat($request->getHeader('Authorization')[0], Assert::stringContains('oauth_signature="', false), '');
+    }
+
+    /**
+     * @param array $container History container populated by Guzzle's history middleware
+     * @param array $config    Additional Guzzle client configuration
+     */
+    private function createClientWithHistory(Oauth1 $middleware, array &$container, array $config = []): Client
+    {
+        $handler = function ($request, array $options) {
+            return Create::promiseFor(new Response(200));
+        };
+        $stack = HandlerStack::create($handler);
+        $stack->push($middleware);
+        $stack->push(Middleware::history($container));
+
+        return new Client(['handler' => $stack] + $config);
+    }
+
+    /**
+     * @return array<string, string> Authorization parameters indexed by parameter name
+     */
+    private function parseAuthorizationHeader(RequestInterface $request): array
+    {
+        $header = $request->getHeaderLine('Authorization');
+        $this->assertSame('OAuth ', substr($header, 0, 6));
+
+        preg_match_all('/([A-Za-z_]+)="([^"]*)"/', $header, $matches, PREG_SET_ORDER);
+
+        $params = [];
+        foreach ($matches as $match) {
+            $params[$match[1]] = rawurldecode($match[2]);
+        }
+
+        return $params;
     }
 }
