@@ -213,9 +213,79 @@ class Oauth1Test extends TestCase
 
         $request = new Request('GET', 'https://httpbin.org/get?field&field=value');
         $requestWithEmptyValue = new Request('GET', 'https://httpbin.org/get?field=&field=value');
+        $requestWithReversedValues = new Request('GET', 'https://httpbin.org/get?field=value&field');
 
         $this->assertSame(
             $oauth->getSignature($requestWithEmptyValue, $params),
+            $oauth->getSignature($request, $params)
+        );
+        $this->assertSame(
+            $oauth->getSignature($requestWithEmptyValue, $params),
+            $oauth->getSignature($requestWithReversedValues, $params)
+        );
+    }
+
+    public function testSortsDuplicateNumericQueryStringParameterValuesAsEncodedStrings(): void
+    {
+        $oauth = new Oauth1($this->config);
+        $params = [
+            'oauth_consumer_key' => 'foo',
+            'oauth_nonce' => self::NONCE,
+            'oauth_signature_method' => Oauth1::SIGNATURE_METHOD_HMAC,
+            'oauth_timestamp' => self::TIMESTAMP,
+            'oauth_token' => 'count',
+            'oauth_version' => '1.0',
+        ];
+
+        $request = new Request('GET', 'https://httpbin.org/get?field=2&field=10&field=100');
+
+        $this->assertSame(
+            'j4XnAZ8btzl0XLximiYzknCKQiU=',
+            $oauth->getSignature($request, $params)
+        );
+    }
+
+    public function testSortsDuplicateQueryStringParameterValuesByEncodedValue(): void
+    {
+        $oauth = new Oauth1($this->config);
+        $params = [
+            'oauth_consumer_key' => 'foo',
+            'oauth_nonce' => self::NONCE,
+            'oauth_signature_method' => Oauth1::SIGNATURE_METHOD_HMAC,
+            'oauth_timestamp' => self::TIMESTAMP,
+            'oauth_token' => 'count',
+            'oauth_version' => '1.0',
+        ];
+
+        $request = new Request('GET', 'https://httpbin.org/get?field=A&field=%60');
+
+        $this->assertSame(
+            '7iuquCJ3mkhCQoCtLxLhL94+gjQ=',
+            $oauth->getSignature($request, $params)
+        );
+    }
+
+    public function testSortsDuplicateFormBodyParameterValuesByEncodedValue(): void
+    {
+        $oauth = new Oauth1($this->config);
+        $params = [
+            'oauth_consumer_key' => 'foo',
+            'oauth_nonce' => self::NONCE,
+            'oauth_signature_method' => Oauth1::SIGNATURE_METHOD_HMAC,
+            'oauth_timestamp' => self::TIMESTAMP,
+            'oauth_token' => 'count',
+            'oauth_version' => '1.0',
+        ];
+
+        $request = new Request(
+            'POST',
+            'https://httpbin.org/post',
+            ['Content-Type' => 'application/x-www-form-urlencoded'],
+            'field=A&field=%60'
+        );
+
+        $this->assertSame(
+            '2IP6IMFoTQcHwVmuCL/TYKC6pI8=',
             $oauth->getSignature($request, $params)
         );
     }

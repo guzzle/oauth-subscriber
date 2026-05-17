@@ -4,6 +4,7 @@
 
 * Added support for PHP 8.5
 * Convert RSA signing failures to runtime exceptions
+* Fixed OAuth parameter normalization for duplicate parameter values
 * Sign bare query and form parameters as empty values
 
 ## 0.8.2 - 2026-05-16
