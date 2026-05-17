@@ -6,5 +6,6 @@
 /phpstan-baseline.neon  export-ignore
 /phpstan.neon.dist      export-ignore
 /phpunit.xml.dist       export-ignore
+/Makefile               export-ignore
 /tests/                 export-ignore
 /vendor-bin/            export-ignore

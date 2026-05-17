@@ -53,20 +53,10 @@ class Oauth1Test extends TestCase
 
     public function testCreatesStringToSignFromPostRequest(): void
     {
-        $stack = HandlerStack::create();
-
-        $middleware = new Oauth1($this->config);
-        $stack->push($middleware);
-
         $container = [];
-        $history = Middleware::history($container);
-        $stack->push($history);
+        $client = $this->createServerClientWithHistory(new Oauth1($this->config), $container);
 
-        $client = new Client([
-            'handler' => $stack,
-        ]);
-
-        $client->post('https://httpbin.org/post', [
+        $client->post(Server::$url.'post', [
             'auth' => 'oauth',
             'form_params' => [
                 'foo' => [
@@ -298,20 +288,10 @@ class Oauth1Test extends TestCase
         $config = $this->config;
         $config['signature_method'] = Oauth1::SIGNATURE_METHOD_PLAINTEXT;
 
-        $stack = HandlerStack::create();
-
-        $middleware = new Oauth1($config);
-        $stack->push($middleware);
-
         $container = [];
-        $history = Middleware::history($container);
-        $stack->push($history);
+        $client = $this->createServerClientWithHistory(new Oauth1($config), $container);
 
-        $client = new Client([
-            'handler' => $stack,
-        ]);
-
-        $client->get('https://httpbin.org', ['auth' => 'oauth']);
+        $client->get(Server::$url, ['auth' => 'oauth']);
 
         /* @var Request $request */
         $request = $container[0]['request'];
@@ -323,20 +303,10 @@ class Oauth1Test extends TestCase
 
     public function testSignsOauthRequestsInHeader(): void
     {
-        $stack = HandlerStack::create();
-
-        $middleware = new Oauth1($this->config);
-        $stack->push($middleware);
-
         $container = [];
-        $history = Middleware::history($container);
-        $stack->push($history);
+        $client = $this->createServerClientWithHistory(new Oauth1($this->config), $container);
 
-        $client = new Client([
-            'handler' => $stack,
-        ]);
-
-        $client->post('https://httpbin.org/post', [
+        $client->post(Server::$url.'post', [
             'auth' => 'oauth',
         ]);
 
@@ -358,20 +328,10 @@ class Oauth1Test extends TestCase
         $config = $this->config;
         $config['request_method'] = Oauth1::REQUEST_METHOD_QUERY;
 
-        $stack = HandlerStack::create();
-
-        $middleware = new Oauth1($config);
-        $stack->push($middleware);
-
         $container = [];
-        $history = Middleware::history($container);
-        $stack->push($history);
+        $client = $this->createServerClientWithHistory(new Oauth1($config), $container);
 
-        $client = new Client([
-            'handler' => $stack,
-        ]);
-
-        $client->get('https://httpbin.org', ['auth' => 'oauth']);
+        $client->get(Server::$url, ['auth' => 'oauth']);
 
         /* @var Request $request */
         $request = $container[0]['request'];
@@ -392,20 +352,10 @@ class Oauth1Test extends TestCase
 
     public function testOnlyTouchesWhenAuthConfigIsOauth(): void
     {
-        $stack = HandlerStack::create();
-
-        $middleware = new Oauth1($this->config);
-        $stack->push($middleware);
-
         $container = [];
-        $history = Middleware::history($container);
-        $stack->push($history);
+        $client = $this->createServerClientWithHistory(new Oauth1($this->config), $container);
 
-        $client = new Client([
-            'handler' => $stack,
-        ]);
-
-        $client->get('https://httpbin.org');
+        $client->get(Server::$url);
 
         /* @var Request $request */
         $request = $container[0]['request'];
@@ -724,19 +674,13 @@ class Oauth1Test extends TestCase
             $this->expectException(\InvalidArgumentException::class);
         }
 
-        $stack = HandlerStack::create();
-
         $config = $this->config;
         $config['request_method'] = 'Foo';
 
-        $middleware = new Oauth1($config);
-        $stack->push($middleware);
+        $container = [];
+        $client = $this->createClientWithHistory(new Oauth1($config), $container);
 
-        $client = new Client([
-            'handler' => $stack,
-        ]);
-
-        $client->get('https://httpbin.org', ['auth' => 'oauth']);
+        $client->get('https://example.com', ['auth' => 'oauth']);
     }
 
     public function testExceptionOnSignatureError(): void
@@ -747,19 +691,13 @@ class Oauth1Test extends TestCase
             $this->expectException(\RuntimeException::class);
         }
 
-        $stack = HandlerStack::create();
-
         $config = $this->config;
         $config['signature_method'] = 'Foo';
 
-        $middleware = new Oauth1($config);
-        $stack->push($middleware);
+        $container = [];
+        $client = $this->createClientWithHistory(new Oauth1($config), $container);
 
-        $client = new Client([
-            'handler' => $stack,
-        ]);
-
-        $client->get('https://httpbin.org', ['auth' => 'oauth']);
+        $client->get('https://example.com', ['auth' => 'oauth']);
     }
 
     public function testExceptionOnMissingRsaPrivateKeyFileOption(): void
@@ -869,20 +807,10 @@ class Oauth1Test extends TestCase
         $config = $this->config;
         unset($config['token']);
 
-        $stack = HandlerStack::create();
-
-        $middleware = new Oauth1($config);
-        $stack->push($middleware);
-
         $container = [];
-        $history = Middleware::history($container);
-        $stack->push($history);
+        $client = $this->createServerClientWithHistory(new Oauth1($config), $container);
 
-        $client = new Client([
-            'handler' => $stack,
-        ]);
-
-        $client->get('https://httpbin.org', ['auth' => 'oauth']);
+        $client->get(Server::$url, ['auth' => 'oauth']);
 
         /* @var Request $request */
         $request = $container[0]['request'];
@@ -896,20 +824,10 @@ class Oauth1Test extends TestCase
         $config = $this->config;
         $config['foo'] = 'bar';
 
-        $stack = HandlerStack::create();
-
-        $middleware = new Oauth1($config);
-        $stack->push($middleware);
-
         $container = [];
-        $history = Middleware::history($container);
-        $stack->push($history);
+        $client = $this->createServerClientWithHistory(new Oauth1($config), $container);
 
-        $client = new Client([
-            'handler' => $stack,
-        ]);
-
-        $client->get('https://httpbin.org', ['auth' => 'oauth']);
+        $client->get(Server::$url, ['auth' => 'oauth']);
 
         /* @var Request $request */
         $request = $container[0]['request'];
@@ -923,20 +841,10 @@ class Oauth1Test extends TestCase
         $config = $this->config;
         $config['realm'] = 'foo';
 
-        $stack = HandlerStack::create();
-
-        $middleware = new Oauth1($config);
-        $stack->push($middleware);
-
         $container = [];
-        $history = Middleware::history($container);
-        $stack->push($history);
+        $client = $this->createServerClientWithHistory(new Oauth1($config), $container);
 
-        $client = new Client([
-            'handler' => $stack,
-        ]);
-
-        $client->get('https://httpbin.org', ['auth' => 'oauth']);
+        $client->get(Server::$url, ['auth' => 'oauth']);
 
         /* @var Request $request */
         $request = $container[0]['request'];
@@ -950,20 +858,10 @@ class Oauth1Test extends TestCase
         $config = $this->config;
         $config['signature_method'] = Oauth1::SIGNATURE_METHOD_HMACSHA256;
 
-        $stack = HandlerStack::create();
-
-        $middleware = new Oauth1($config);
-        $stack->push($middleware);
-
         $container = [];
-        $history = Middleware::history($container);
-        $stack->push($history);
+        $client = $this->createServerClientWithHistory(new Oauth1($config), $container);
 
-        $client = new Client([
-            'handler' => $stack,
-        ]);
-
-        $client->get('https://httpbin.org', ['auth' => 'oauth']);
+        $client->get(Server::$url, ['auth' => 'oauth']);
 
         /* @var Request $request */
         $request = $container[0]['request'];
@@ -987,6 +885,21 @@ class Oauth1Test extends TestCase
         $stack->push(Middleware::history($container));
 
         return new Client(['handler' => $stack] + $config);
+    }
+
+    /**
+     * @param array $container History container populated by Guzzle's history middleware
+     */
+    private function createServerClientWithHistory(Oauth1 $middleware, array &$container): Client
+    {
+        Server::flush();
+        Server::enqueue([new Response(200)]);
+
+        $stack = HandlerStack::create();
+        $stack->push($middleware);
+        $stack->push(Middleware::history($container));
+
+        return new Client(['handler' => $stack]);
     }
 
     /**
