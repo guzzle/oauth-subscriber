@@ -216,10 +216,33 @@ class Oauth1
                         $data[$key][$index] = '';
                     }
                 }
+
+                usort($data[$key], static function ($left, $right): int {
+                    return strcmp(
+                        self::encodeParameterValue($left),
+                        self::encodeParameterValue($right)
+                    );
+                });
             }
         }
 
         return $data;
+    }
+
+    /**
+     * @param mixed $value Parameter value
+     */
+    private static function encodeParameterValue($value): string
+    {
+        if ($value === null) {
+            $value = '';
+        }
+
+        if (is_bool($value)) {
+            $value = (int) $value;
+        }
+
+        return rawurlencode((string) $value);
     }
 
     /**
