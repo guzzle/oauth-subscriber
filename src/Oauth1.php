@@ -87,10 +87,10 @@ class Oauth1
     {
         return function ($request, array $options) use ($handler) {
             if (($options['auth'] ?? null) === 'oauth') {
-                $config = $this->getEffectiveConfig($options);
+                $config = self::getEffectiveConfig($this->config, $options);
                 unset($options['oauth']);
 
-                $request = $this->onBefore($request, $config);
+                $request = self::onBefore($request, $config);
             }
 
             return $handler($request, $options);
@@ -102,14 +102,13 @@ class Oauth1
      *
      * Only token credential overrides are supported in request options.
      *
+     * @param array $config  Base configuration settings
      * @param array $options Request options
      *
      * @throws \InvalidArgumentException
      */
-    private function getEffectiveConfig(array $options): array
+    private static function getEffectiveConfig(array $config, array $options): array
     {
-        $config = $this->config;
-
         if (!array_key_exists('oauth', $options) || $options['oauth'] === null) {
             return $config;
         }
@@ -140,11 +139,11 @@ class Oauth1
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    private function onBefore(RequestInterface $request, array $config): RequestInterface
+    private static function onBefore(RequestInterface $request, array $config): RequestInterface
     {
         $oauthparams = self::getOauthParams($config);
 
-        $oauthparams['oauth_signature'] = $this->getSignatureWithConfig($request, $oauthparams, $config);
+        $oauthparams['oauth_signature'] = self::getSignatureWithConfig($request, $oauthparams, $config);
         uksort($oauthparams, 'strcmp');
 
         switch ($config['request_method']) {
@@ -177,7 +176,7 @@ class Oauth1
      */
     public function getSignature(RequestInterface $request, array $params): string
     {
-        return $this->getSignatureWithConfig($request, $params, $this->config);
+        return self::getSignatureWithConfig($request, $params, $this->config);
     }
 
     /**
@@ -189,7 +188,7 @@ class Oauth1
      *
      * @throws \RuntimeException
      */
-    private function getSignatureWithConfig(RequestInterface $request, array $params, array $config): string
+    private static function getSignatureWithConfig(RequestInterface $request, array $params, array $config): string
     {
         // Add POST fields if the request uses POST fields and no files
         if ($request->getHeaderLine('Content-Type') === 'application/x-www-form-urlencoded') {
@@ -205,7 +204,7 @@ class Oauth1
         // Ref: Spec: 9.1.1 ("The oauth_signature parameter MUST be excluded.")
         unset($params['oauth_signature']);
 
-        $baseString = $this->createBaseString(
+        $baseString = self::createBaseString(
             $request,
             self::prepareParameters($params)
         );
@@ -243,7 +242,7 @@ class Oauth1
      *
      * @see https://oauth.net/core/1.0/#sig_base_example
      */
-    protected function createBaseString(RequestInterface $request, array $params): string
+    private static function createBaseString(RequestInterface $request, array $params): string
     {
         // Remove query params from URL. Ref: Spec: 9.1.2.
         return strtoupper($request->getMethod())

@@ -6,6 +6,7 @@
 * Added support for per-request `token` and `token_secret` overrides
 * Convert RSA signing failures to runtime exceptions
 * Fixed OAuth parameter normalization for duplicate parameter values
+* Made OAuth signature base string generation internal
 * Sign bare query and form parameters as empty values
 
 ## 0.8.2 - 2026-05-16
