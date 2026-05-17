@@ -39,6 +39,11 @@
             "GuzzleHttp\\Subscriber\\Oauth\\": "src"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "GuzzleHttp\\Tests\\Oauth1\\": "tests/"
+        }
+    },
     "suggest": {
         "ext-openssl": "Required to sign using RSA-SHA1"
     },
