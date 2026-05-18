@@ -17,7 +17,7 @@ Server::start();
 register_shutdown_function(static function (): void {
     try {
         Server::stop();
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         // The process may already have been stopped by a local developer.
     }
 });
