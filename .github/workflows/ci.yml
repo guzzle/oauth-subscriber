@@ -23,19 +23,15 @@ jobs:
           extensions: mbstring
 
       - name: Set up Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
-          node-version: '18.x'
+          node-version: '22.x'
 
       - name: Checkout code
         uses: actions/checkout@v6
 
       - name: Install dependencies
         run: composer update --no-interaction --prefer-stable --prefer-lowest --no-progress
-
-      - name: Start test server
-        shell: bash
-        run: node tests/server.js &
 
       - name: Run tests
         run: vendor/bin/phpunit
@@ -59,19 +55,15 @@ jobs:
           extensions: mbstring
 
       - name: Set up Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
-          node-version: '18.x'
+          node-version: '22.x'
 
       - name: Checkout code
         uses: actions/checkout@v6
 
       - name: Install dependencies
         run: composer update --no-interaction --no-progress
-
-      - name: Start test server
-        shell: bash
-        run: node tests/server.js &
 
       - name: Run tests
         run: vendor/bin/phpunit

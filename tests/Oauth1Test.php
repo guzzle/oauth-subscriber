@@ -11,6 +11,7 @@ use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Psr7\Query;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Server\Server;
 use GuzzleHttp\Subscriber\Oauth\Oauth1;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;

@@ -2,11 +2,22 @@
 
 declare(strict_types=1);
 
-require __DIR__.'/../vendor/autoload.php';
-require __DIR__.'/Server.php';
+use GuzzleHttp\Server\Server;
 
-GuzzleHttp\Tests\Oauth1\Server::start();
+require __DIR__.'/../vendor/autoload.php';
+
+$port = getenv('OAUTH_SUBSCRIBER_TEST_SERVER_PORT');
+if ($port !== false && $port !== '') {
+    Server::$port = (int) $port;
+    Server::$url = 'http://127.0.0.1:'.Server::$port.'/';
+}
+
+Server::start();
 
 register_shutdown_function(static function (): void {
-    GuzzleHttp\Tests\Oauth1\Server::stop();
+    try {
+        Server::stop();
+    } catch (\Exception $e) {
+        // The process may already have been stopped by a local developer.
+    }
 });
