@@ -11,11 +11,11 @@ help:
 	@echo "  clean                          to remove build artifacts"
 
 start-server: stop-server
-	node tests/server.js $${OAUTH_SUBSCRIBER_TEST_SERVER_PORT:-8126} &> /dev/null &
+	node vendor/guzzlehttp/test-server/src/server.js $${OAUTH_SUBSCRIBER_TEST_SERVER_PORT:-8126} &> /dev/null &
 
 stop-server:
 	@PID=$(shell ps axo pid,command \
-	  | grep 'tests/server.js' \
+	  | grep 'vendor/guzzlehttp/test-server/src/server.js' \
 	  | grep -v grep \
 	  | cut -f 1 -d " "\
 	) && [ -n "$$PID" ] && kill $$PID || true
