@@ -1,8 +1,11 @@
 {
     "name": "guzzlehttp/oauth-subscriber",
     "description": "Guzzle OAuth 1.0 subscriber",
-    "keywords": ["oauth", "guzzle"],
     "license": "MIT",
+    "keywords": [
+        "oauth",
+        "guzzle"
+    ],
     "authors": [
         {
             "name": "Graham Campbell",
@@ -26,14 +29,17 @@
         }
     ],
     "require": {
-        "php" : "^7.2.5 || ^8.0",
+        "php": "^7.2.5 || ^8.0",
         "guzzlehttp/guzzle": "^7.10",
         "guzzlehttp/psr7": "^2.8"
     },
     "require-dev": {
         "bamarni/composer-bin-plugin": "^1.8.2",
         "guzzlehttp/test-server": "^0.3.2",
-        "phpunit/phpunit" : "^8.5.36 || ^9.6.15"
+        "phpunit/phpunit": "^8.5.52 || ^9.6.34"
+    },
+    "suggest": {
+        "ext-openssl": "Required to sign using RSA-SHA1"
     },
     "autoload": {
         "psr-4": {
@@ -45,20 +51,17 @@
             "GuzzleHttp\\Tests\\Oauth1\\": "tests/"
         }
     },
-    "suggest": {
-        "ext-openssl": "Required to sign using RSA-SHA1"
-    },
-    "extra": {
-        "bamarni-bin": {
-            "bin-links": true,
-            "forward-command": false
-        }
-    },
     "config": {
         "allow-plugins": {
             "bamarni/composer-bin-plugin": true
         },
         "preferred-install": "dist",
         "sort-packages": true
+    },
+    "extra": {
+        "bamarni-bin": {
+            "bin-links": true,
+            "forward-command": false
+        }
     }
 }
