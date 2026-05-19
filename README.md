@@ -18,6 +18,10 @@ This project can be installed using Composer. Add the following to your
 }
 ```
 
+## Upgrading
+
+Please see [UPGRADING](UPGRADING.md) for details on upgrading to new major versions.
+
 ## Using the Subscriber
 
 Here's an example showing how to send an authenticated request to the
