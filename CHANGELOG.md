@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 1.0.0 - Unreleased
+
+* Dropped support for PHP 7.2 and 7.3
+* Switched from Guzzle 7.x to 8.x and from Guzzle PSR-7 2.x to 3.x
+
 ## 0.9.0 - 2026-05-19
 
 * Added support for PHP 8.5
