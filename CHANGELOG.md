@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## 0.9.0 - 2026-05-19
 
 * Added support for PHP 8.5
 * Added support for per-request `token` and `token_secret` overrides
