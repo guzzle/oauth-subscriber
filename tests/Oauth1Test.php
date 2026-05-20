@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\Create;
+use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Query;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -22,7 +23,7 @@ class Oauth1Test extends TestCase
     public const TIMESTAMP = '1327274290';
     public const NONCE = 'e7aa11195ca58349bec8b5ebe351d3497eb9e603';
 
-    private $config = [
+    private array $config = [
         'consumer_key' => 'foo',
         'consumer_secret' => 'bar',
         'token' => 'count',
@@ -878,7 +879,7 @@ class Oauth1Test extends TestCase
      */
     private function createClientWithHistory(Oauth1 $middleware, array &$container, array $config = []): Client
     {
-        $handler = function ($request, array $options) {
+        $handler = function (RequestInterface $request, array $options): PromiseInterface {
             return Create::promiseFor(new Response(200));
         };
         $stack = HandlerStack::create($handler);
