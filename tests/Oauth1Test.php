@@ -17,6 +17,7 @@ use GuzzleHttp\Subscriber\Oauth\Oauth1;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 class Oauth1Test extends TestCase
 {
@@ -874,11 +875,17 @@ class Oauth1Test extends TestCase
     }
 
     /**
-     * @param array $container History container populated by Guzzle's history middleware
-     * @param array $config    Additional Guzzle client configuration
+     * @param array<array-key, array{
+     *     request: RequestInterface,
+     *     response: ResponseInterface|null,
+     *     error: mixed,
+     *     options: array<array-key, mixed>
+     * }> $container History container populated by Guzzle's history middleware.
+     * @param array<array-key, mixed> $config Additional Guzzle client configuration.
      */
     private function createClientWithHistory(Oauth1 $middleware, array &$container, array $config = []): Client
     {
+        /** @var callable(RequestInterface, array<array-key, mixed>): PromiseInterface<ResponseInterface, mixed> $handler */
         $handler = function (RequestInterface $request, array $options): PromiseInterface {
             return Create::promiseFor(new Response(200));
         };
@@ -890,7 +897,12 @@ class Oauth1Test extends TestCase
     }
 
     /**
-     * @param array $container History container populated by Guzzle's history middleware
+     * @param array<array-key, array{
+     *     request: RequestInterface,
+     *     response: ResponseInterface|null,
+     *     error: mixed,
+     *     options: array<array-key, mixed>
+     * }> $container History container populated by Guzzle's history middleware.
      */
     private function createServerClientWithHistory(Oauth1 $middleware, array &$container): Client
     {
