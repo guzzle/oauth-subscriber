@@ -7,6 +7,7 @@ namespace GuzzleHttp\Subscriber\Oauth;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Query;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * OAuth 1.0 signature plugin.
@@ -58,8 +59,24 @@ class Oauth1
      * - realm: OAuth realm.
      * - signature_method: Signature method. One of 'HMAC-SHA1', 'RSA-SHA1',
      *   'HMAC-SHA256', or 'PLAINTEXT'. Defaults to 'HMAC-SHA1'.
+     * - bodyhash: OAuth body hash.
      *
-     * @param array $config Configuration array.
+     * @param array{
+     *     request_method?: 'header'|'query',
+     *     callback?: string,
+     *     consumer_key?: string,
+     *     consumer_secret?: string,
+     *     private_key_file?: string,
+     *     private_key_passphrase?: string,
+     *     token?: string,
+     *     token_secret?: string,
+     *     verifier?: string,
+     *     version?: string,
+     *     realm?: string,
+     *     signature_method?: 'HMAC-SHA1'|'RSA-SHA1'|'HMAC-SHA256'|'PLAINTEXT',
+     *     bodyhash?: string,
+     *     ...
+     * } $config Configuration array.
      */
     public function __construct(array $config)
     {
@@ -79,7 +96,9 @@ class Oauth1
     /**
      * Called when the middleware is handled.
      *
-     * @param callable(RequestInterface, array): PromiseInterface $handler
+     * @param callable(RequestInterface, array<array-key, mixed>): PromiseInterface<ResponseInterface, mixed> $handler
+     *
+     * @return \Closure(RequestInterface, array<array-key, mixed>): PromiseInterface<ResponseInterface, mixed>
      *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException

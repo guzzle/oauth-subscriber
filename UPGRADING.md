@@ -28,3 +28,15 @@ signature to remain compatible.
 
 OAuth middleware handlers are expected to follow Guzzle 8's handler contract and
 return `GuzzleHttp\Promise\PromiseInterface` values.
+
+#### Generic Promise And Structured PHPDoc Types
+
+`Oauth1::__invoke()` now documents the standard Guzzle middleware handler
+contract with generic `PromiseInterface<ResponseInterface, mixed>` PHPDoc types.
+This is a static-analysis-only change and does not alter runtime behavior, but
+projects with stricter static analysis may see new or different diagnostics.
+
+`Oauth1::__construct()` config PHPDoc now uses a structured array shape for the
+supported OAuth options. If your project documents reusable OAuth config arrays
+or custom middleware handlers, you may need to update those PHPDoc annotations to
+match the supported option and handler shapes.

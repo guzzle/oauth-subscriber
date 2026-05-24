@@ -24,6 +24,10 @@ Please see [UPGRADING](UPGRADING.md) for details on upgrading to new major versi
 
 ## Using the Subscriber
 
+`GuzzleHttp\Subscriber\Oauth\Oauth1` is invokable Guzzle middleware. It wraps a
+standard Guzzle handler and returns a handler closure with the same contract:
+`callable(Psr\Http\Message\RequestInterface, array<array-key, mixed>): GuzzleHttp\Promise\PromiseInterface<Psr\Http\Message\ResponseInterface, mixed>`.
+
 Here's an example showing how to send an authenticated request to the
 Twitter REST API:
 
