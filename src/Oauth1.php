@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace GuzzleHttp\Subscriber\Oauth;
 
+use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Query;
 use Psr\Http\Message\RequestInterface;
 
@@ -78,14 +79,14 @@ class Oauth1
     /**
      * Called when the middleware is handled.
      *
-     * @return \Closure
+     * @param callable(RequestInterface, array): PromiseInterface $handler
      *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    public function __invoke(callable $handler)
+    public function __invoke(callable $handler): \Closure
     {
-        return function ($request, array $options) use ($handler) {
+        return function ($request, array $options) use ($handler): PromiseInterface {
             if (($options['auth'] ?? null) === 'oauth') {
                 $config = self::getEffectiveConfig($this->config, $options);
                 unset($options['oauth']);

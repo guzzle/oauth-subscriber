@@ -19,3 +19,12 @@ Guzzle PSR-7 `^2.8`.
 If your application still supports PHP 7.2 or 7.3, or still uses Guzzle 7 or
 Guzzle PSR-7 2, continue using Guzzle OAuth Subscriber 0.9 until your minimum
 requirements are raised.
+
+#### Native Signatures
+
+`GuzzleHttp\Subscriber\Oauth\Oauth1::__invoke()` now declares a `\Closure`
+return type. Subclasses overriding this method must update their method
+signature to remain compatible.
+
+OAuth middleware handlers are expected to follow Guzzle 8's handler contract and
+return `GuzzleHttp\Promise\PromiseInterface` values.
