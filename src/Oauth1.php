@@ -105,7 +105,7 @@ class Oauth1
      */
     public function __invoke(callable $handler): \Closure
     {
-        return function ($request, array $options) use ($handler): PromiseInterface {
+        return function (RequestInterface $request, array $options) use ($handler): PromiseInterface {
             if (($options['auth'] ?? null) === 'oauth') {
                 $config = self::getEffectiveConfig($this->config, $options);
                 unset($options['oauth']);
