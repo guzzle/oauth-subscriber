@@ -378,10 +378,7 @@ class Oauth1
         return $signature;
     }
 
-    /**
-     * @return string
-     */
-    private static function signUsingPlaintext(string $baseString)
+    private static function signUsingPlaintext(string $baseString): string
     {
         return $baseString;
     }
