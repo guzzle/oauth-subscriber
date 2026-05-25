@@ -36,7 +36,7 @@ class Oauth1
     public const SIGNATURE_METHOD_PLAINTEXT = 'PLAINTEXT';
 
     /** @var array Configuration settings */
-    private $config;
+    private array $config;
 
     /**
      * Create a new OAuth 1.0 plugin.
