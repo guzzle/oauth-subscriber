@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.9.1 - UPCOMING
+
+* Require `guzzlehttp/guzzle` ^7.11, `guzzlehttp/psr7` ^2.11
+
 ## 0.9.0 - 2026-05-19
 
 * Added support for PHP 8.5
