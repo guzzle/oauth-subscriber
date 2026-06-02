@@ -7,6 +7,10 @@
 * Added native return types to the OAuth middleware entry point
 * Improved PHPDoc for OAuth config arrays and middleware handler contracts
 
+## 0.9.1 - 2026-06-02
+
+* Require `guzzlehttp/guzzle` ^7.11, `guzzlehttp/psr7` ^2.11
+
 ## 0.9.0 - 2026-05-19
 
 * Added support for PHP 8.5
