@@ -372,7 +372,7 @@ class Oauth1Test extends TestCase
         $container = [];
         $client = $this->createClientWithHistory(new Oauth1($this->config), $container);
 
-        $client->get('https://example.com', ['auth' => true]);
+        $client->get('https://example.com', ['auth' => 'not-oauth']);
 
         $request = $container[0]['request'];
 
