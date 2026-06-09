@@ -15,7 +15,7 @@ composer require guzzlehttp/oauth-subscriber
 | Version | Status       | PHP Version  |
 |---------|--------------|--------------|
 | 1.x     | Experimental | >=7.4,<8.6   |
-| 0.9     | Latest       | >=7.2.5,<8.6 |
+| 0.9.x   | Latest       | >=7.2.5,<8.6 |
 
 ## Quick Start
 
@@ -44,9 +44,10 @@ You can also set `'auth' => 'oauth'` as a client default when every request sent
 
 ## Documentation
 
-- [Usage Guide](docs/usage.md)
-- [RSA-SH1 Signatures](docs/signature-methods.md)
+- [OAuth 1.0 Middleware Usage](docs/oauth-1-0-middleware-usage.md)
+- [Signature Methods](docs/oauth-1-0-middleware-usage.md#signature-methods)
 - [Upgrade Guide](UPGRADING.md)
+- [Changelog](CHANGELOG.md)
 
 ## Security
 
