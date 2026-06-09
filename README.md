@@ -1,35 +1,16 @@
 # Guzzle OAuth Subscriber
 
-Signs HTTP requests using OAuth 1.0. Requests are signed using a
-consumer key, consumer secret, OAuth token, and OAuth secret.
+`guzzlehttp/oauth-subscriber` is OAuth 1.0 middleware for Guzzle. It signs outgoing Guzzle requests with OAuth credentials when the request uses the `auth` option value `oauth`.
 
-This version works with Guzzle 8 and PHP 7.4+.
+Use this package when an API requires OAuth 1.0 request signing. If an API uses OAuth 2.0 bearer tokens, you usually do not need this package; send an `Authorization: Bearer ...` header with Guzzle instead.
 
-## Installing
+## Installation
 
-This project can be installed using Composer. Add the following to your
-`composer.json`:
-
-```json
-{
-    "require": {
-        "guzzlehttp/oauth-subscriber": "^1.0"
-    }
-}
+```bash
+composer require guzzlehttp/oauth-subscriber
 ```
 
-## Upgrading
-
-Please see [UPGRADING](UPGRADING.md) for details on upgrading to new major versions.
-
-## Using the Subscriber
-
-`GuzzleHttp\Subscriber\Oauth\Oauth1` is invokable Guzzle middleware. It wraps a
-standard Guzzle handler and returns a handler closure with the same contract:
-`callable(Psr\Http\Message\RequestInterface, array<array-key, mixed>): GuzzleHttp\Promise\PromiseInterface<Psr\Http\Message\ResponseInterface, mixed>`.
-
-Here's an example showing how to send an authenticated request to the
-Twitter REST API:
+## Quick Start
 
 ```php
 use GuzzleHttp\Client;
@@ -37,99 +18,36 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Subscriber\Oauth\Oauth1;
 
 $stack = HandlerStack::create();
-
-$middleware = new Oauth1([
-    'consumer_key'    => 'my_key',
+$stack->push(new Oauth1([
+    'consumer_key' => 'my_key',
     'consumer_secret' => 'my_secret',
-    'token'           => 'my_token',
-    'token_secret'    => 'my_token_secret',
-]);
-$stack->push($middleware);
+    'token' => 'my_token',
+    'token_secret' => 'my_token_secret',
+]));
 
 $client = new Client([
-    'base_uri' => 'https://api.twitter.com/1.1/',
+    'base_uri' => 'https://api.example.com/',
     'handler' => $stack,
 ]);
 
-// Set the "auth" request option to "oauth" to sign using oauth
-$res = $client->get('statuses/home_timeline.json', ['auth' => 'oauth']);
+$response = $client->get('resource', ['auth' => 'oauth']);
 ```
 
-You can set the `auth` request option to `oauth` for all requests sent
-by the client by extending the array you feed to `new Client` with auth
-=> oauth.
+You can also set `'auth' => 'oauth'` as a client default when every request sent by that client should be signed.
 
-```php
-use GuzzleHttp\Client;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Subscriber\Oauth\Oauth1;
+## Documentation
 
-$stack = HandlerStack::create();
+- [Full documentation](docs/index.md)
+- [Using the subscriber](docs/index.md#using-the-subscriber)
+- [RSA-SH1 signatures](docs/index.md#using-the-rsa-sh1-signature-method)
+- [Upgrade guide](UPGRADING.md)
 
-$middleware = new Oauth1([
-    'consumer_key'    => 'my_key',
-    'consumer_secret' => 'my_secret',
-    'token'           => 'my_token',
-    'token_secret'    => 'my_token_secret',
-]);
-$stack->push($middleware);
+## Security
 
-$client = new Client([
-    'base_uri' => 'https://api.twitter.com/1.1/',
-    'handler' => $stack,
-    'auth' => 'oauth',
-]);
+OAuth credentials are secrets. Avoid logging request options that contain `oauth` values, and make sure retry middleware re-enters this middleware when refreshed credentials must be used.
 
-// Now you don't need to add the auth parameter
-$res = $client->get('statuses/home_timeline.json');
-```
+If you discover a security vulnerability within this package, please send an email to security@tidelift.com. All security vulnerabilities will be promptly addressed. Please do not disclose security-related issues publicly until a fix has been announced. Please see [Security Policy](https://github.com/guzzle/oauth-subscriber/security/policy) for more information.
 
-You can override the `token` and `token_secret` values for an individual
-request using the `oauth` request option. The `auth` request option must
-still be set to `oauth` to enable signing for the request.
+## License
 
-```php
-$res = $client->get('statuses/home_timeline.json', [
-    'auth' => 'oauth',
-    'oauth' => [
-        'token'        => 'request_token',
-        'token_secret' => 'request_token_secret',
-    ],
-]);
-```
-
-Only `token` and `token_secret` are supported in the `oauth` request
-option. Pass both values when switching to a different credential pair.
-Do not pass OAuth credentials using Guzzle's array-based `auth` option,
-which is reserved for Guzzle's built-in HTTP authentication handlers. If
-you use custom retry middleware to refresh credentials, make sure retries
-re-enter this middleware so each retry is signed with fresh OAuth
-parameters. Custom middleware that runs before this middleware can still
-see the `oauth` request option, so avoid logging request options that
-contain secrets.
-
-You can set the `token` and `token_secret` options to an empty string to
-use two-legged OAuth.
-
-## Using the RSA-SH1 signature method
-
-```php
-use GuzzleHttp\Subscriber\Oauth\Oauth1;
-
-$stack = HandlerStack::create();
-
-$middleware = new Oauth1([
-    'consumer_key'           => 'my_key',
-    'consumer_secret'        => 'my_secret',
-    'private_key_file'       => 'my_path_to_private_key_file',
-    'private_key_passphrase' => 'my_passphrase',
-    'signature_method'       => Oauth1::SIGNATURE_METHOD_RSA,
-]);
-$stack->push($middleware);
-
-$client = new Client([
-    'handler' => $stack,
-]);
-
-$response = $client->get('https://httpbin.org/', ['auth' => 'oauth']);
-```
+Guzzle OAuth Subscriber is made available under the MIT License (MIT). Please see [License File](LICENSE) for more information.
