@@ -13,8 +13,8 @@ Guzzle PSR-7 3.x.
 Guzzle OAuth Subscriber 1.0 requires PHP `^7.4 || ^8.0`,
 [Guzzle 8.x](https://github.com/guzzle/guzzle/blob/8.0/UPGRADING.md), and
 [Guzzle PSR-7 3.x](https://github.com/guzzle/psr7/blob/3.0/UPGRADING.md).
-Guzzle OAuth Subscriber 0.9 supported PHP `^7.2.5 || ^8.0`, Guzzle `^7.10`, and
-Guzzle PSR-7 `^2.8`.
+Guzzle OAuth Subscriber 0.9 supported PHP `^7.2.5 || ^8.0`, Guzzle `^7.11`, and
+Guzzle PSR-7 `^2.11`.
 
 If your application still supports PHP 7.2 or 7.3, or still uses Guzzle 7 or
 Guzzle PSR-7 2, continue using Guzzle OAuth Subscriber 0.9 until your minimum
@@ -29,7 +29,7 @@ signature to remain compatible.
 OAuth middleware handlers are expected to follow Guzzle 8's handler contract and
 return `GuzzleHttp\Promise\PromiseInterface` values.
 
-#### Generic Promise And Structured PHPDoc Types
+#### Generic Promise and Structured PHPDoc Types
 
 `Oauth1::__invoke()` now documents the standard Guzzle middleware handler
 contract with generic `PromiseInterface<ResponseInterface, mixed>` PHPDoc types.
