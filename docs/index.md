@@ -13,6 +13,13 @@ Install the package with Composer:
 composer require guzzlehttp/oauth-subscriber
 ```
 
+## Version Guidance
+
+| Version | Status       | PHP Version  |
+|---------|--------------|--------------|
+| 1.x     | Experimental | >=7.4,<8.6   |
+| 0.9     | Latest       | >=7.2.5,<8.6 |
+
 ## Upgrading
 
 Please see [UPGRADING](../UPGRADING.md) for details on upgrading to new major versions.

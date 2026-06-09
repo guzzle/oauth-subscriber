@@ -42,6 +42,13 @@ You can also set `'auth' => 'oauth'` as a client default when every request sent
 - [RSA-SH1 signatures](docs/index.md#using-the-rsa-sh1-signature-method)
 - [Upgrade guide](UPGRADING.md)
 
+## Version Guidance
+
+| Version | Status       | PHP Version  |
+|---------|--------------|--------------|
+| 1.x     | Experimental | >=7.4,<8.6   |
+| 0.9     | Latest       | >=7.2.5,<8.6 |
+
 ## Security
 
 OAuth credentials are secrets. Avoid logging request options that contain `oauth` values, and make sure retry middleware re-enters this middleware when refreshed credentials must be used.
