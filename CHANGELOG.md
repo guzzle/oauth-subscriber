@@ -4,6 +4,7 @@
 
 * Dropped support for PHP 7.2 and 7.3
 * Switched from Guzzle 7.x to 8.x and from Guzzle PSR-7 2.x to 3.x
+* Reject native PHP serialization of `Oauth1`
 * Added native return types to the OAuth middleware entry point
 * Improved PHPDoc for OAuth config arrays and middleware handler contracts
 
