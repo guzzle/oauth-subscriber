@@ -10,6 +10,13 @@ Use this package when an API requires OAuth 1.0 request signing. If an API uses 
 composer require guzzlehttp/oauth-subscriber
 ```
 
+## Version Guidance
+
+| Version | Status       | PHP Version  |
+|---------|--------------|--------------|
+| 1.x     | Experimental | >=7.4,<8.6   |
+| 0.9     | Latest       | >=7.2.5,<8.6 |
+
 ## Quick Start
 
 ```php
@@ -41,13 +48,6 @@ You can also set `'auth' => 'oauth'` as a client default when every request sent
 - [Using the subscriber](docs/index.md#using-the-subscriber)
 - [RSA-SH1 signatures](docs/index.md#using-the-rsa-sh1-signature-method)
 - [Upgrade guide](UPGRADING.md)
-
-## Version Guidance
-
-| Version | Status       | PHP Version  |
-|---------|--------------|--------------|
-| 1.x     | Experimental | >=7.4,<8.6   |
-| 0.9     | Latest       | >=7.2.5,<8.6 |
 
 ## Security
 
