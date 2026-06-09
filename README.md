@@ -44,10 +44,9 @@ You can also set `'auth' => 'oauth'` as a client default when every request sent
 
 ## Documentation
 
-- [Full documentation](docs/index.md)
-- [Using the subscriber](docs/index.md#using-the-subscriber)
-- [RSA-SH1 signatures](docs/index.md#using-the-rsa-sh1-signature-method)
-- [Upgrade guide](UPGRADING.md)
+- [Usage Guide](docs/usage.md)
+- [RSA-SH1 Signatures](docs/signature-methods.md)
+- [Upgrade Guide](UPGRADING.md)
 
 ## Security
 
