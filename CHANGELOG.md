@@ -8,6 +8,10 @@
 * Added native return types to the OAuth middleware entry point
 * Improved PHPDoc for OAuth config arrays and middleware handler contracts
 
+## 0.9.2 - 2026-06-12
+
+* Fixed non-finite float values emitting coercion warnings on PHP 8.5
+
 ## 0.9.1 - 2026-06-02
 
 * Require `guzzlehttp/guzzle` ^7.11, `guzzlehttp/psr7` ^2.11
