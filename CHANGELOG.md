@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.9.2 - Upcoming
+
+* Fixed non-finite float values emitting coercion warnings on PHP 8.5
+
 ## 0.9.1 - 2026-06-02
 
 * Require `guzzlehttp/guzzle` ^7.11, `guzzlehttp/psr7` ^2.11

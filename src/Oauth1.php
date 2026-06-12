@@ -269,6 +269,8 @@ class Oauth1
                 foreach ($value as $index => $nestedValue) {
                     if ($nestedValue === null) {
                         $data[$key][$index] = '';
+                    } else {
+                        $data[$key][$index] = self::normalizeNonFiniteFloat($nestedValue);
                     }
                 }
 
@@ -278,7 +280,11 @@ class Oauth1
                         self::encodeParameterValue($right)
                     );
                 });
+
+                continue;
             }
+
+            $data[$key] = self::normalizeNonFiniteFloat($value);
         }
 
         return $data;
@@ -297,7 +303,24 @@ class Oauth1
             $value = (int) $value;
         }
 
-        return rawurlencode((string) $value);
+        return rawurlencode((string) self::normalizeNonFiniteFloat($value));
+    }
+
+    /**
+     * Converts non-finite floats to the strings PHP coerces them to, as
+     * implicit coercion of NAN emits a warning on PHP 8.5.
+     *
+     * @param mixed $value Parameter value
+     *
+     * @return mixed
+     */
+    private static function normalizeNonFiniteFloat($value)
+    {
+        if (is_float($value) && !is_finite($value)) {
+            return is_nan($value) ? 'NAN' : ($value > 0 ? 'INF' : '-INF');
+        }
+
+        return $value;
     }
 
     /**
@@ -375,7 +398,7 @@ class Oauth1
     private static function buildAuthorizationHeader(array $params, array $config): array
     {
         foreach ($params as $key => $value) {
-            $params[$key] = $key.'="'.rawurlencode((string) $value).'"';
+            $params[$key] = $key.'="'.rawurlencode((string) self::normalizeNonFiniteFloat($value)).'"';
         }
 
         if (isset($config['realm'])) {
@@ -419,6 +442,6 @@ class Oauth1
             }
         }
 
-        return $params;
+        return array_map([self::class, 'normalizeNonFiniteFloat'], $params);
     }
 }
