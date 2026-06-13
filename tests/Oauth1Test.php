@@ -75,6 +75,27 @@ class Oauth1Test extends TestCase
         $this->assertTrue($request->hasHeader('Authorization'));
     }
 
+    /**
+     * @dataProvider nonFiniteFloatProvider
+     */
+    public function testRejectsNonFiniteFloatParameters(float $value): void
+    {
+        $oauth = new Oauth1($this->config);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Non-finite floats are not supported in OAuth parameters.');
+        $oauth->getSignature(new Request('POST', 'http://example.com/'), ['score' => $value]);
+    }
+
+    public static function nonFiniteFloatProvider(): array
+    {
+        return [
+            'NAN' => [\NAN],
+            'INF' => [\INF],
+            '-INF' => [-\INF],
+        ];
+    }
+
     public function testExcludesOauthSignatureFromFormBodySignature(): void
     {
         $oauth = new Oauth1($this->config);
