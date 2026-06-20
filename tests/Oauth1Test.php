@@ -127,6 +127,43 @@ class Oauth1Test extends TestCase
         );
     }
 
+    public function testSignsParameterizedFormContentType(): void
+    {
+        $oauth = new Oauth1($this->config);
+        $params = [
+            'oauth_consumer_key' => 'foo',
+            'oauth_nonce' => self::NONCE,
+            'oauth_signature_method' => Oauth1::SIGNATURE_METHOD_HMAC,
+            'oauth_timestamp' => self::TIMESTAMP,
+            'oauth_token' => 'count',
+            'oauth_version' => '1.0',
+        ];
+        $expected = 'E/WAxZzxBlCa7o/phy7QC3Ogp10=';
+
+        $exact = new Request(
+            'POST',
+            'https://httpbin.org/post',
+            ['Content-Type' => 'application/x-www-form-urlencoded'],
+            'foo=bar'
+        );
+        $parameterized = new Request(
+            'POST',
+            'https://httpbin.org/post',
+            ['Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8'],
+            'foo=bar'
+        );
+        $uppercase = new Request(
+            'POST',
+            'https://httpbin.org/post',
+            ['Content-Type' => 'APPLICATION/X-WWW-FORM-URLENCODED; charset=UTF-8'],
+            'foo=bar'
+        );
+
+        $this->assertSame($expected, $oauth->getSignature($exact, $params));
+        $this->assertSame($expected, $oauth->getSignature($parameterized, $params));
+        $this->assertSame($expected, $oauth->getSignature($uppercase, $params));
+    }
+
     public function testSignsBareFormBodyParametersAsEmptyValues(): void
     {
         $oauth = new Oauth1($this->config);
