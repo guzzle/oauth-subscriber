@@ -980,7 +980,7 @@ class Oauth1Test extends TestCase
     private function parseAuthorizationHeader(RequestInterface $request): array
     {
         $header = $request->getHeaderLine('Authorization');
-        $this->assertSame('OAuth ', substr($header, 0, 6));
+        $this->assertStringStartsWith('OAuth ', $header);
 
         preg_match_all('/([A-Za-z_]+)="([^"]*)"/', $header, $matches, PREG_SET_ORDER);
 
