@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.9.3 - Upcoming
+
+* Fixed form body signing for parameterized and case-insensitive content types
+
 ## 0.9.2 - 2026-06-12
 
 * Fixed non-finite float values emitting coercion warnings on PHP 8.5

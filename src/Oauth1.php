@@ -191,7 +191,10 @@ class Oauth1
     private static function getSignatureWithConfig(RequestInterface $request, array $params, array $config): string
     {
         // Add POST fields if the request uses POST fields and no files
-        if ($request->getHeaderLine('Content-Type') === 'application/x-www-form-urlencoded') {
+        $contentType = $request->getHeaderLine('Content-Type');
+        $mediaType = strtolower(trim(explode(';', $contentType, 2)[0]));
+
+        if ($mediaType === 'application/x-www-form-urlencoded') {
             $body = Query::parse($request->getBody()->getContents());
             $params += $body;
         }
