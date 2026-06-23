@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.9.3 - Upcoming
+## 0.9.3 - 2026-06-23
 
 * Require `guzzlehttp/guzzle` ^7.12.3 and `guzzlehttp/psr7` ^2.12.3
 * Fixed form body signing for parameterized and case-insensitive content types
