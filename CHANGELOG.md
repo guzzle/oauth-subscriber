@@ -9,8 +9,9 @@
 * Added native return types to the OAuth middleware entry point
 * Improved PHPDoc for OAuth config arrays and middleware handler contracts
 
-## 0.9.3 - Upcoming
+## 0.9.3 - 2026-06-23
 
+* Require `guzzlehttp/guzzle` ^7.12.3 and `guzzlehttp/psr7` ^2.12.3
 * Fixed form body signing for parameterized and case-insensitive content types
 
 ## 0.9.2 - 2026-06-12
