@@ -2,6 +2,7 @@
 
 ## 0.9.3 - Upcoming
 
+* Require `guzzlehttp/guzzle` ^7.12.3 and `guzzlehttp/psr7` ^2.12.3
 * Fixed form body signing for parameterized and case-insensitive content types
 
 ## 0.9.2 - 2026-06-12

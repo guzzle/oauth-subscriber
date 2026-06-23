@@ -30,8 +30,8 @@
     ],
     "require": {
         "php": "^7.2.5 || ^8.0",
-        "guzzlehttp/guzzle": "^7.11",
-        "guzzlehttp/psr7": "^2.11"
+        "guzzlehttp/guzzle": "^7.12.3",
+        "guzzlehttp/psr7": "^2.12.3"
     },
     "require-dev": {
         "bamarni/composer-bin-plugin": "^1.8.2",
