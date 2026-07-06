@@ -192,7 +192,7 @@ class Oauth1
     {
         // Add POST fields if the request uses POST fields and no files
         $contentType = $request->getHeaderLine('Content-Type');
-        $mediaType = strtolower(trim(explode(';', $contentType, 2)[0]));
+        $mediaType = strtolower(trim(explode(';', $contentType, 2)[0], " \n\r\t\0\x0B"));
 
         if ($mediaType === 'application/x-www-form-urlencoded') {
             $body = Query::parse($request->getBody()->getContents());
