@@ -8,6 +8,7 @@
 * Reject non-finite float values in OAuth parameters
 * Added native return types to the OAuth middleware entry point
 * Improved PHPDoc for OAuth config arrays and middleware handler contracts
+* Trim `Content-Type` media types with HTTP optional whitespace when signing
 
 ## 0.9.3 - 2026-06-23
 
