@@ -12,7 +12,7 @@ OAuth 2.0 bearer-token APIs usually do not need this package. For those APIs, se
 
 ## Attaching Middleware
 
-`Oauth1` is invokable [Guzzle middleware](https://github.com/guzzle/guzzle/blob/8.0/docs/handlers-and-middleware.md). Push it onto the client handler stack before sending signed requests:
+`Oauth1` is invokable [Guzzle middleware](https://github.com/guzzle/guzzle/blob/8.0/docs/middleware.md). Push it onto the client handler stack before sending signed requests:
 
 ```php
 use GuzzleHttp\Client;
@@ -232,7 +232,8 @@ If custom retry middleware refreshes credentials, make sure each retry re-enters
 
 ## Related
 
-- [Guzzle handlers and middleware](https://github.com/guzzle/guzzle/blob/8.0/docs/handlers-and-middleware.md)
+- [Guzzle middleware](https://github.com/guzzle/guzzle/blob/8.0/docs/middleware.md)
+- [Guzzle handlers](https://github.com/guzzle/guzzle/blob/8.0/docs/handlers.md)
 - [Guzzle `auth` request option](https://github.com/guzzle/guzzle/blob/8.0/docs/request-options.md#auth)
 - [Upgrade Guide](../UPGRADING.md)
 - [Changelog](../CHANGELOG.md)
