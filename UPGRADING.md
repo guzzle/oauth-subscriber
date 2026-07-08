@@ -35,6 +35,12 @@ return `GuzzleHttp\Promise\PromiseInterface` values.
 Persist OAuth configuration values and create a new middleware instance instead
 of persisting runtime middleware objects.
 
+#### Non-Finite Float OAuth Parameters
+
+OAuth parameter values containing `NAN`, `INF`, or `-INF` now throw an
+`\InvalidArgumentException` during signature generation. Convert these
+values to finite strings or omit them before they enter OAuth parameters.
+
 #### Generic Promise and Structured PHPDoc Types
 
 `Oauth1::__invoke()` now documents the standard Guzzle middleware handler
@@ -44,5 +50,5 @@ projects with stricter static analysis may see new or different diagnostics.
 
 `Oauth1::__construct()` config PHPDoc now uses a structured array shape for the
 supported OAuth options. If your project documents reusable OAuth config arrays
-or custom middleware handlers, you may need to update those PHPDoc annotations to
-match the supported option and handler shapes.
+or custom middleware handlers, you may need to update those PHPDoc annotations
+to match the supported option and handler shapes.

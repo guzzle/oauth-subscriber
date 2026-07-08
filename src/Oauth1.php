@@ -202,6 +202,7 @@ class Oauth1
      * @param RequestInterface $request Request to generate a signature for
      * @param array            $params  Oauth parameters.
      *
+     * @throws \InvalidArgumentException If OAuth parameters contain non-finite floats.
      * @throws \RuntimeException
      */
     public function getSignature(RequestInterface $request, array $params): string
@@ -216,6 +217,7 @@ class Oauth1
      * @param array            $params  Oauth parameters
      * @param array            $config  Configuration settings for this request
      *
+     * @throws \InvalidArgumentException If OAuth parameters contain non-finite floats.
      * @throws \RuntimeException
      */
     private static function getSignatureWithConfig(RequestInterface $request, array $params, array $config): string
