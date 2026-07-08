@@ -54,6 +54,24 @@ class Oauth1Test extends TestCase
         $this->assertEquals('header', $config['request_method']);
     }
 
+    public function testRejectsNativePhpSerializationWithRuntimeClassName(): void
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(Oauth1SerializationTestDouble::class.' should never be serialized');
+
+        serialize(new Oauth1SerializationTestDouble($this->config));
+    }
+
+    public function testRejectsNativePhpUnserializationWithRuntimeClassName(): void
+    {
+        $class = Oauth1SerializationTestDouble::class;
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage($class.' should never be unserialized');
+
+        unserialize(sprintf('O:%d:"%s":0:{}', strlen($class), $class));
+    }
+
     public function testCreatesStringToSignFromPostRequest(): void
     {
         $container = [];
@@ -991,4 +1009,8 @@ class Oauth1Test extends TestCase
 
         return $params;
     }
+}
+
+final class Oauth1SerializationTestDouble extends Oauth1
+{
 }
