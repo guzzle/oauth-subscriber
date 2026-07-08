@@ -176,10 +176,17 @@ class Oauth1Test extends TestCase
             ['Content-Type' => 'APPLICATION/X-WWW-FORM-URLENCODED; charset=UTF-8'],
             'foo=bar'
         );
+        $ows = new Request(
+            'POST',
+            'https://httpbin.org/post',
+            ['Content-Type' => "application/x-www-form-urlencoded \t; charset=UTF-8"],
+            'foo=bar'
+        );
 
         $this->assertSame($expected, $oauth->getSignature($exact, $params));
         $this->assertSame($expected, $oauth->getSignature($parameterized, $params));
         $this->assertSame($expected, $oauth->getSignature($uppercase, $params));
+        $this->assertSame($expected, $oauth->getSignature($ows, $params));
     }
 
     public function testSignsBareFormBodyParametersAsEmptyValues(): void
