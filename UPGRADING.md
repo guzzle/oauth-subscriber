@@ -29,6 +29,12 @@ signature to remain compatible.
 OAuth middleware handlers are expected to follow Guzzle 8's handler contract and
 return `GuzzleHttp\Promise\PromiseInterface` values.
 
+#### Native PHP Serialization
+
+`Oauth1` no longer supports native PHP `serialize()` or `unserialize()`.
+Persist OAuth configuration values and create a new middleware instance instead
+of persisting runtime middleware objects.
+
 #### Generic Promise and Structured PHPDoc Types
 
 `Oauth1::__invoke()` now documents the standard Guzzle middleware handler
