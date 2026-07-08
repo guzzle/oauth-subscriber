@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.9.4 - Unreleased
+## 0.9.4 - 2026-07-08
 
 * Require `guzzlehttp/guzzle` ^7.13.3 and `guzzlehttp/psr7` ^2.12.4
 * Pass explicit trim characters ahead of the PHP 8.6 trim default change
