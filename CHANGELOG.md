@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.9.5 - Upcoming
+
+* Require `guzzlehttp/psr7` ^2.13
+* Use locale-independent ASCII case folding for signature base string inputs
+
 ## 0.9.4 - 2026-07-08
 
 * Require `guzzlehttp/guzzle` ^7.13.3 and `guzzlehttp/psr7` ^2.12.4
