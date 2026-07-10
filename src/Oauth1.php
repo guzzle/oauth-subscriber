@@ -6,6 +6,7 @@ namespace GuzzleHttp\Subscriber\Oauth;
 
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Query;
+use GuzzleHttp\Psr7\Utils;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -224,7 +225,7 @@ class Oauth1
     {
         // Add POST fields if the request uses POST fields and no files
         $contentType = $request->getHeaderLine('Content-Type');
-        $mediaType = strtolower(trim(explode(';', $contentType, 2)[0], " \t"));
+        $mediaType = Utils::asciiToLower(trim(explode(';', $contentType, 2)[0], " \t"));
 
         if ($mediaType === 'application/x-www-form-urlencoded') {
             $body = Query::parse($request->getBody()->getContents());
@@ -280,7 +281,7 @@ class Oauth1
     private static function createBaseString(RequestInterface $request, array $params): string
     {
         // Remove query params from URL. Ref: Spec: 9.1.2.
-        return strtoupper($request->getMethod())
+        return Utils::asciiToUpper($request->getMethod())
             .'&'.rawurlencode((string) $request->getUri()->withQuery(''))
             .'&'.rawurlencode(Query::build($params));
     }
