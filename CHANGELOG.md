@@ -4,6 +4,7 @@
 
 * Dropped support for PHP 7.2 and 7.3
 * Switched from Guzzle 7.x to 8.x and from Guzzle PSR-7 2.x to 3.x
+* Escape unsafe configuration values in generated OAuth exceptions
 * Reject native PHP serialization of `Oauth1`
 * Reject non-finite float values in OAuth parameters
 * Added native return types to the OAuth middleware entry point
