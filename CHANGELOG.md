@@ -11,6 +11,11 @@
 * Improved PHPDoc for OAuth config arrays and middleware handler contracts
 * Trim `Content-Type` media types with HTTP optional whitespace when signing
 
+## 0.9.5 - 2026-07-17
+
+* Require `guzzlehttp/guzzle` ^7.15 and `guzzlehttp/psr7` ^2.13
+* Use locale-independent ASCII case folding for signature base string inputs
+
 ## 0.9.4 - 2026-07-08
 
 * Require `guzzlehttp/guzzle` ^7.13.3 and `guzzlehttp/psr7` ^2.12.4
