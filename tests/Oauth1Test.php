@@ -786,6 +786,55 @@ class Oauth1Test extends TestCase
         $client->get('https://example.com', ['auth' => 'oauth']);
     }
 
+    /**
+     * @param class-string<\Throwable> $expectedException
+     *
+     * @dataProvider unsafeConfigurationValueProvider
+     */
+    public function testEscapesUnsafeConfigurationValues(string $option, string $value, string $expectedException, string $expectedMessage): void
+    {
+        if ($option === 'private_key_file' && !function_exists('openssl_pkey_get_private')) {
+            $this->markTestSkipped('OpenSSL extension is not available.');
+        }
+
+        $config = $this->config;
+        $config[$option] = $value;
+        if ($option === 'private_key_file') {
+            $config['signature_method'] = Oauth1::SIGNATURE_METHOD_RSA;
+        }
+
+        $oauth = new Oauth1($config);
+        $this->expectException($expectedException);
+        $this->expectExceptionMessage($expectedMessage);
+
+        if ($option === 'request_method') {
+            $container = [];
+            $client = $this->createClientWithHistory($oauth, $container);
+            $client->get('https://example.com', ['auth' => 'oauth']);
+
+            return;
+        }
+
+        $oauth->getSignature(new Request('GET', 'https://example.com'), []);
+    }
+
+    public static function unsafeConfigurationValueProvider(): array
+    {
+        $c1 = "value\xC2\x9B";
+        $malformed = "value\xFF";
+        $c1Path = __DIR__."/missing-\xC2\x9B.pem";
+        $malformedPath = __DIR__."/missing-\xFF.pem";
+
+        return [
+            'request method with C1 control' => ['request_method', $c1, \InvalidArgumentException::class, 'Invalid consumer method: value\\x9B'],
+            'request method with malformed UTF-8' => ['request_method', $malformed, \InvalidArgumentException::class, 'Invalid consumer method: value\\xFF'],
+            'signature method with C1 control' => ['signature_method', $c1, \RuntimeException::class, 'Unknown signature method: value\\x9B'],
+            'signature method with malformed UTF-8' => ['signature_method', $malformed, \RuntimeException::class, 'Unknown signature method: value\\xFF'],
+            'private key path with C1 control' => ['private_key_file', $c1Path, \RuntimeException::class, 'Unable to read RSA private key file: '.__DIR__.'/missing-\\x9B.pem'],
+            'private key path with malformed UTF-8' => ['private_key_file', $malformedPath, \RuntimeException::class, 'Unable to read RSA private key file: '.__DIR__.'/missing-\\xFF.pem'],
+        ];
+    }
+
     public function testExceptionOnMissingRsaPrivateKeyFileOption(): void
     {
         if (!function_exists('openssl_pkey_get_private')) {

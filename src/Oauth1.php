@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace GuzzleHttp\Subscriber\Oauth;
 
 use GuzzleHttp\Promise\PromiseInterface;
+use GuzzleHttp\Psr7\DiagnosticValue;
 use GuzzleHttp\Psr7\Query;
 use GuzzleHttp\Psr7\Utils;
 use Psr\Http\Message\RequestInterface;
@@ -188,10 +189,7 @@ class Oauth1
                 $request = $request->withUri($request->getUri()->withQuery($preparedParams));
                 break;
             default:
-                throw new \InvalidArgumentException(sprintf(
-                    'Invalid consumer method "%s"',
-                    $config['request_method']
-                ));
+                throw new \InvalidArgumentException(\sprintf('Invalid consumer method: %s', DiagnosticValue::escape((string) $config['request_method'])));
         }
 
         return $request;
@@ -260,7 +258,7 @@ class Oauth1
                 $signature = self::signUsingPlaintext($baseString);
                 break;
             default:
-                throw new \RuntimeException('Unknown signature method: '.$config['signature_method']);
+                throw new \RuntimeException(\sprintf('Unknown signature method: %s', DiagnosticValue::escape((string) $config['signature_method'])));
         }
 
         return base64_encode($signature);
@@ -387,10 +385,7 @@ class Oauth1
 
         $keyContents = @file_get_contents($config['private_key_file']);
         if ($keyContents === false) {
-            throw new \RuntimeException(sprintf(
-                'Unable to read RSA private key file: %s',
-                $config['private_key_file']
-            ));
+            throw new \RuntimeException(\sprintf('Unable to read RSA private key file: %s', DiagnosticValue::escape($config['private_key_file'])));
         }
 
         if (isset($config['private_key_passphrase'])) {
