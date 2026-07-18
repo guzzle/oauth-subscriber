@@ -117,7 +117,12 @@ class Oauth1
      */
     public function __invoke(callable $handler): \Closure
     {
-        return function (RequestInterface $request, array $options) use ($handler): PromiseInterface {
+        return function (
+            #[\SensitiveParameter]
+            RequestInterface $request,
+            #[\SensitiveParameter]
+            array $options
+        ) use ($handler): PromiseInterface {
             if (($options['auth'] ?? null) === 'oauth') {
                 $config = self::getEffectiveConfig($this->config, $options);
                 unset($options['oauth']);
@@ -139,8 +144,12 @@ class Oauth1
      *
      * @throws \InvalidArgumentException
      */
-    private static function getEffectiveConfig(array $config, array $options): array
-    {
+    private static function getEffectiveConfig(
+        #[\SensitiveParameter]
+        array $config,
+        #[\SensitiveParameter]
+        array $options
+    ): array {
         if (!array_key_exists('oauth', $options) || $options['oauth'] === null) {
             return $config;
         }
@@ -171,8 +180,12 @@ class Oauth1
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    private static function onBefore(RequestInterface $request, array $config): RequestInterface
-    {
+    private static function onBefore(
+        #[\SensitiveParameter]
+        RequestInterface $request,
+        #[\SensitiveParameter]
+        array $config
+    ): RequestInterface {
         $oauthparams = self::getOauthParams($config);
 
         $oauthparams['oauth_signature'] = self::getSignatureWithConfig($request, $oauthparams, $config);
@@ -204,8 +217,12 @@ class Oauth1
      * @throws \InvalidArgumentException If OAuth parameters contain non-finite floats.
      * @throws \RuntimeException
      */
-    public function getSignature(RequestInterface $request, array $params): string
-    {
+    public function getSignature(
+        #[\SensitiveParameter]
+        RequestInterface $request,
+        #[\SensitiveParameter]
+        array $params
+    ): string {
         return self::getSignatureWithConfig($request, $params, $this->config);
     }
 
@@ -219,8 +236,14 @@ class Oauth1
      * @throws \InvalidArgumentException If OAuth parameters contain non-finite floats.
      * @throws \RuntimeException
      */
-    private static function getSignatureWithConfig(RequestInterface $request, array $params, array $config): string
-    {
+    private static function getSignatureWithConfig(
+        #[\SensitiveParameter]
+        RequestInterface $request,
+        #[\SensitiveParameter]
+        array $params,
+        #[\SensitiveParameter]
+        array $config
+    ): string {
         // Add POST fields if the request uses POST fields and no files
         $contentType = $request->getHeaderLine('Content-Type');
         $mediaType = Utils::asciiToLower(trim(explode(';', $contentType, 2)[0], " \t"));
@@ -276,8 +299,12 @@ class Oauth1
      *
      * @see https://oauth.net/core/1.0/#sig_base_example
      */
-    private static function createBaseString(RequestInterface $request, array $params): string
-    {
+    private static function createBaseString(
+        #[\SensitiveParameter]
+        RequestInterface $request,
+        #[\SensitiveParameter]
+        array $params
+    ): string {
         // Remove query params from URL. Ref: Spec: 9.1.2.
         return Utils::asciiToUpper($request->getMethod())
             .'&'.rawurlencode((string) $request->getUri()->withQuery(''))
@@ -287,8 +314,10 @@ class Oauth1
     /**
      * @param array $data The data array
      */
-    private static function prepareParameters(array $data): array
-    {
+    private static function prepareParameters(
+        #[\SensitiveParameter]
+        array $data
+    ): array {
         // Parameters are sorted by name, using lexicographical byte value
         // ordering. Ref: Spec: 9.1.1 (1).
         uksort($data, 'strcmp');
@@ -308,7 +337,12 @@ class Oauth1
                     }
                 }
 
-                usort($data[$key], static function ($left, $right): int {
+                usort($data[$key], static function (
+                    #[\SensitiveParameter]
+                    $left,
+                    #[\SensitiveParameter]
+                    $right
+                ): int {
                     return strcmp(
                         self::encodeParameterValue($left),
                         self::encodeParameterValue($right)
@@ -356,8 +390,13 @@ class Oauth1
      * @param string $algo   Name of selected hashing algorithm (i.e. "md5", "sha256", "haval160,4", etc..)
      * @param array  $config Configuration settings for this request
      */
-    private static function signUsingHmac(string $algo, string $baseString, array $config): string
-    {
+    private static function signUsingHmac(
+        string $algo,
+        #[\SensitiveParameter]
+        string $baseString,
+        #[\SensitiveParameter]
+        array $config
+    ): string {
         $key = rawurlencode($config['consumer_secret']).'&';
         if (isset($config['token_secret'])) {
             $key .= rawurlencode($config['token_secret']);
@@ -371,8 +410,12 @@ class Oauth1
      *
      * @throws \RuntimeException
      */
-    private static function signUsingRsaSha1(string $baseString, array $config): string
-    {
+    private static function signUsingRsaSha1(
+        #[\SensitiveParameter]
+        string $baseString,
+        #[\SensitiveParameter]
+        array $config
+    ): string {
         if (!function_exists('openssl_pkey_get_private')) {
             throw new \RuntimeException('RSA-SHA1 signature method requires the OpenSSL extension.');
         }
@@ -418,8 +461,12 @@ class Oauth1
      * @param array $params Associative array of authorization parameters.
      * @param array $config Configuration settings for this request
      */
-    private static function buildAuthorizationHeader(array $params, array $config): array
-    {
+    private static function buildAuthorizationHeader(
+        #[\SensitiveParameter]
+        array $params,
+        #[\SensitiveParameter]
+        array $config
+    ): array {
         foreach ($params as $key => $value) {
             self::assertFiniteFloat($value);
             $params[$key] = $key.'="'.rawurlencode((string) $value).'"';
@@ -440,8 +487,10 @@ class Oauth1
      *
      * @param array $config Configuration options of the plugin.
      */
-    private static function getOauthParams(array $config): array
-    {
+    private static function getOauthParams(
+        #[\SensitiveParameter]
+        array $config
+    ): array {
         $params = [
             'oauth_consumer_key' => $config['consumer_key'],
             'oauth_nonce' => bin2hex(random_bytes(20)),

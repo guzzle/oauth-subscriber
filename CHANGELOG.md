@@ -10,6 +10,7 @@
 * Added native return types to the OAuth middleware entry point
 * Improved PHPDoc for OAuth config arrays and middleware handler contracts
 * Trim `Content-Type` media types with HTTP optional whitespace when signing
+* Hide sensitive OAuth arguments in stack traces on PHP 8.2+
 
 ## 0.9.5 - 2026-07-17
 
