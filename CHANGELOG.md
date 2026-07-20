@@ -1,9 +1,9 @@
 # CHANGELOG
 
-## 1.0.0 - Unreleased
+## 1.0.0 - 2026-07-20
 
 * Dropped support for PHP 7.2 and 7.3
-* Switched from Guzzle 7.x to 8.x and from Guzzle PSR-7 2.x to 3.x
+* Require `guzzlehttp/guzzle` ^8.0, `guzzlehttp/promises` ^3.0, and `guzzlehttp/psr7` ^3.0
 * Escape unsafe configuration values in generated OAuth exceptions
 * Reject native PHP serialization of `Oauth1`
 * Reject non-finite float values in OAuth parameters

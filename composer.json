@@ -30,14 +30,14 @@
     ],
     "require": {
         "php": "^7.4 || ^8.0",
-        "guzzlehttp/guzzle": "^8.0@dev",
-        "guzzlehttp/psr7": "^3.0@dev",
+        "guzzlehttp/guzzle": "^8.0",
+        "guzzlehttp/promises": "^3.0",
+        "guzzlehttp/psr7": "^3.0",
         "symfony/polyfill-php82": "^1.27"
     },
     "require-dev": {
         "bamarni/composer-bin-plugin": "^1.8.2",
-        "guzzlehttp/promises": "^3.0@dev",
-        "guzzlehttp/test-server": "^1.0@dev",
+        "guzzlehttp/test-server": "^1.0",
         "phpunit/phpunit": "^9.6.34"
     },
     "suggest": {
