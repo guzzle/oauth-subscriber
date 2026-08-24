@@ -18,8 +18,8 @@ composer require guzzlehttp/oauth-subscriber
 
 | Version | Status       | PHP Version  |
 |---------|--------------|--------------|
-| 1.0     | Latest       | >=7.4,<8.6   |
-| 0.9     | Maintenance  | >=7.2.5,<8.6 |
+| 1.0     | Latest       | >=7.4,<8.7   |
+| 0.9     | Maintenance  | >=7.2.5,<8.7 |
 
 ## Quick Start
 
