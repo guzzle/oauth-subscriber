@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.9.6 - Upcoming
+
+* Added PHP 8.6 to the tested versions
+
 ## 0.9.5 - 2026-07-17
 
 * Require `guzzlehttp/guzzle` ^7.15 and `guzzlehttp/psr7` ^2.13
