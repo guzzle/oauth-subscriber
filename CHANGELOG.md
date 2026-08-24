@@ -2,7 +2,7 @@
 
 ## 1.0.1 - Upcoming
 
-* Added PHP 8.6 to the supported and tested versions
+* Added support for PHP 8.6
 
 ## 1.0.0 - 2026-07-20
 
