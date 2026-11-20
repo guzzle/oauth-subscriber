@@ -361,7 +361,7 @@ class Oauth1
     /**
      * @param mixed $value Parameter value
      */
-    private static function encodeParameterValue($value): string
+    private static function encodeParameterValue(mixed $value): string
     {
         if ($value === null) {
             $value = '';
@@ -379,7 +379,7 @@ class Oauth1
     /**
      * @param mixed $value Parameter value
      */
-    private static function assertFiniteFloat($value): void
+    private static function assertFiniteFloat(mixed $value): void
     {
         if (is_float($value) && !is_finite($value)) {
             throw new \InvalidArgumentException('Non-finite floats are not supported in OAuth parameters.');
