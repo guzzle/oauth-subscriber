@@ -18,6 +18,7 @@ composer require guzzlehttp/oauth-subscriber
 
 | Version | Status       | PHP Version  |
 |---------|--------------|--------------|
+| 2.0     | Experimental | >=8.0,<8.7   |
 | 1.0     | Latest       | >=7.4,<8.7   |
 | 0.9     | Maintenance  | >=7.2.5,<8.7 |
 

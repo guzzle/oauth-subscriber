@@ -1,6 +1,24 @@
 Guzzle OAuth Subscriber Upgrade Guide
 =====================================
 
+1.x to 2.0
+----------
+
+Guzzle OAuth Subscriber 2.0 is a major release that raises the minimum PHP
+version and updates the supported Guzzle dependency stack for Guzzle 9, Guzzle
+Promises 4.x, and Guzzle PSR-7 4.x.
+
+#### PHP Version and Dependencies
+
+Guzzle OAuth Subscriber 2.0 requires PHP `^8.0`,
+[Guzzle 9.x](https://github.com/guzzle/guzzle/blob/9.0/UPGRADING.md),
+[Guzzle Promises 4.x](https://github.com/guzzle/promises/blob/4.0/UPGRADING.md),
+and [Guzzle PSR-7 4.x](https://github.com/guzzle/psr7/blob/4.0/UPGRADING.md).
+
+If your application still supports PHP 7.4, or still uses Guzzle 8, Guzzle
+Promises 3, or Guzzle PSR-7 3, continue using Guzzle OAuth Subscriber 1.x until
+your minimum requirements are raised.
+
 0.9 to 1.0
 ----------
 

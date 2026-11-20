@@ -22,7 +22,7 @@ send the bearer token using normal Guzzle request options, for example
 ## Attaching Middleware
 
 `Oauth1` is invokable
-[Guzzle middleware](https://github.com/guzzle/guzzle/blob/8.0/docs/middleware.md).
+[Guzzle middleware](https://github.com/guzzle/guzzle/blob/9.0/docs/middleware.md).
 Push it onto the client handler stack before sending signed requests:
 
 ```php
@@ -51,7 +51,7 @@ $response = $client->get('resource', ['auth' => 'oauth']);
 ## Signing Requests
 
 The OAuth middleware only signs a request when the Guzzle
-[`auth` request option](https://github.com/guzzle/guzzle/blob/8.0/docs/request-options.md#auth)
+[`auth` request option](https://github.com/guzzle/guzzle/blob/9.0/docs/request-options.md#auth)
 is exactly `oauth`.
 
 ```php
@@ -276,8 +276,8 @@ nonce, timestamp, or token value.
 
 ## Related
 
-- [Guzzle middleware](https://github.com/guzzle/guzzle/blob/8.0/docs/middleware.md)
-- [Guzzle handlers](https://github.com/guzzle/guzzle/blob/8.0/docs/handlers.md)
-- [Guzzle `auth` request option](https://github.com/guzzle/guzzle/blob/8.0/docs/request-options.md#auth)
+- [Guzzle middleware](https://github.com/guzzle/guzzle/blob/9.0/docs/middleware.md)
+- [Guzzle handlers](https://github.com/guzzle/guzzle/blob/9.0/docs/handlers.md)
+- [Guzzle `auth` request option](https://github.com/guzzle/guzzle/blob/9.0/docs/request-options.md#auth)
 - [Upgrade Guide](../UPGRADING.md)
 - [Changelog](../CHANGELOG.md)
