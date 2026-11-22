@@ -155,7 +155,7 @@ class Oauth1
             case self::REQUEST_METHOD_QUERY:
                 $queryParams = Query::parse($request->getUri()->getQuery());
                 $preparedParams = Query::build($oauthparams + $queryParams);
-                $request = $request->withUri($request->getUri()->withQuery($preparedParams));
+                $request = $request->withUri($request->getUri()->withQuery($preparedParams), true);
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf(

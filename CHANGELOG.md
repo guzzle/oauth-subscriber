@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.9.7 - Upcoming
+
+* Fixed the `query` request method replacing a custom `Host` header
+
 ## 0.9.6 - 2026-08-24
 
 * Added support for PHP 8.6
