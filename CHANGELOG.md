@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.9.7 - Upcoming
+## 0.9.7 - 2026-11-22
 
 * Fixed the `query` request method replacing a custom `Host` header
 
