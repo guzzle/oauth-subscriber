@@ -5,6 +5,10 @@
 * Dropped support for PHP 7
 * Require `guzzlehttp/guzzle` ^9.0, `guzzlehttp/promises` ^4.0, and `guzzlehttp/psr7` ^4.0
 
+## 1.0.2 - 2026-11-22
+
+* Fixed the `query` request method replacing a custom `Host` header
+
 ## 1.0.1 - 2026-08-24
 
 * Added support for PHP 8.6

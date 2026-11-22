@@ -436,6 +436,22 @@ class Oauth1Test extends TestCase
         $this->assertSame($keys, $check);
     }
 
+    public function testPreservesHostHeaderInOauthQueryStringRequest(): void
+    {
+        $config = $this->config;
+        $config['request_method'] = Oauth1::REQUEST_METHOD_QUERY;
+
+        $container = [];
+        $client = $this->createServerClientWithHistory(new Oauth1($config), $container);
+
+        $client->get(Server::$url, ['auth' => 'oauth', 'headers' => ['Host' => 'example.com']]);
+
+        /* @var Request $request */
+        $request = $container[0]['request'];
+
+        $this->assertSame('example.com', $request->getHeaderLine('Host'));
+    }
+
     public function testOnlyTouchesWhenAuthConfigIsOauth(): void
     {
         $container = [];
